@@ -1,5 +1,25 @@
 import SwiftUI
 
+/// Pre-filled values for a new custom endpoint. On-device builds default to a local server
+/// (spec section 5); cloud builds keep upstream's values.
+enum CustomEndpointDefaults {
+    #if CLOUD_PROVIDERS
+    static let transcriptionEndpoint = "https://api.openai.com/v1/audio/transcriptions"
+    static let transcriptionModel = "gpt-4o-mini-transcribe"
+    static let transcriptionModelPlaceholder = "gpt-4o-mini-transcribe"
+    static let chatBaseURL = "https://api.openai.com/v1/chat/completions"
+    static let chatModel = "gpt-5.5"
+    static let chatModelPlaceholder = "gpt-5.5"
+    #else
+    static let transcriptionEndpoint = "http://localhost:8080/v1/audio/transcriptions"
+    static let transcriptionModel = ""
+    static let transcriptionModelPlaceholder = String(localized: "Model name")
+    static let chatBaseURL = "http://localhost:11434/v1/chat/completions"
+    static let chatModel = ""
+    static let chatModelPlaceholder = String(localized: "Model name")
+    #endif
+}
+
 struct CustomProviderManagementView: View {
     @ObservedObject var customModelManager: CustomCloudModelManager
     @ObservedObject var customAIProviderManager: CustomAIProviderManager
@@ -247,13 +267,14 @@ struct CustomTranscriptionModelEditorPanel: View {
                                 label: "Display Name", placeholder: String(localized: "My Custom Model"),
                                 text: $displayName)
                             CustomModelTextField(
-                                label: "API Endpoint", placeholder: "https://api.openai.com/v1/audio/transcriptions",
+                                label: "API Endpoint", placeholder: CustomEndpointDefaults.transcriptionEndpoint,
                                 text: $apiEndpoint)
                             CustomModelTextField(
                                 label: "API Key", placeholder: String(localized: "Paste API key"), text: $apiKey,
                                 isSecure: true)
                             CustomModelTextField(
-                                label: "Model Name", placeholder: "gpt-4o-mini-transcribe", text: $modelName)
+                                label: "Model Name", placeholder: CustomEndpointDefaults.transcriptionModelPlaceholder,
+                                text: $modelName)
                             CustomModelToggleRow(title: "Multilingual Model", isOn: $isMultilingual)
                             ConnectionTestRow(
                                 state: connectionTest, isDisabled: !canTestConnection, action: runConnectionTest)
@@ -322,9 +343,9 @@ struct CustomTranscriptionModelEditorPanel: View {
             isMultilingual = editingModel.isMultilingualModel
         } else {
             displayName = ""
-            apiEndpoint = "https://api.openai.com/v1/audio/transcriptions"
+            apiEndpoint = CustomEndpointDefaults.transcriptionEndpoint
             apiKey = ""
-            modelName = "gpt-4o-mini-transcribe"
+            modelName = CustomEndpointDefaults.transcriptionModel
             isMultilingual = true
         }
 
@@ -500,12 +521,14 @@ struct CustomEnhancementModelEditorPanel: View {
                                 label: "Display Name", placeholder: String(localized: "My Enhancement Model"),
                                 text: $displayName)
                             CustomModelTextField(
-                                label: "Base URL", placeholder: "https://api.openai.com/v1/chat/completions",
+                                label: "Base URL", placeholder: CustomEndpointDefaults.chatBaseURL,
                                 text: $baseURL)
                             CustomModelTextField(
                                 label: "API Key", placeholder: String(localized: "Paste API key"), text: $apiKey,
                                 isSecure: true)
-                            CustomModelTextField(label: "Model Name", placeholder: "gpt-5.5", text: $modelName)
+                            CustomModelTextField(
+                                label: "Model Name", placeholder: CustomEndpointDefaults.chatModelPlaceholder,
+                                text: $modelName)
                             ConnectionTestRow(
                                 state: connectionTest, isDisabled: !canTestConnection, action: runConnectionTest)
                         }
@@ -574,9 +597,9 @@ struct CustomEnhancementModelEditorPanel: View {
             modelName = editingProvider.modelName
         } else {
             displayName = ""
-            baseURL = "https://api.openai.com/v1/chat/completions"
+            baseURL = CustomEndpointDefaults.chatBaseURL
             apiKey = ""
-            modelName = "gpt-5.5"
+            modelName = CustomEndpointDefaults.chatModel
         }
 
         errorMessage = nil

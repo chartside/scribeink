@@ -33,7 +33,7 @@ struct OnboardingAPIScreen: View {
                     onVerificationChanged: onVerificationChanged
                 )
             } else {
-                Text("AI enhancement runs on this device. No cloud provider setup is needed.")
+                Text("AI enhancement runs on this Mac or a server you approve. No cloud provider setup is needed.")
                     .font(.system(size: 14))
                     .foregroundColor(AppTheme.Text.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)

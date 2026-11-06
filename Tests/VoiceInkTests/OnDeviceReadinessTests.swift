@@ -165,18 +165,18 @@ final class OnDeviceReadinessTests: XCTestCase {
         // A synthetic model with a provider the on-device policy denies.
         let defaults = makeDefaults()
         let model = SyntheticCloudModel()
-        let mode = mode(transcriptionKey: model.selectionKey)
+        let testMode = self.mode(transcriptionKey: model.selectionKey)
         XCTAssertEqual(
             OnDeviceReadiness.blockedTranscriptionRoute(
-                .available(mode: mode, model: model), knownModels: [model], defaults: defaults, allowsCloud: false),
+                .available(mode: testMode, model: model), knownModels: [model], defaults: defaults, allowsCloud: false),
             .models)
         XCTAssertEqual(
             OnDeviceReadiness.blockedTranscriptionRoute(
-                .unavailable(mode: mode, model: model), knownModels: [model], defaults: defaults, allowsCloud: false),
+                .unavailable(mode: testMode, model: model), knownModels: [model], defaults: defaults, allowsCloud: false),
             .models)
         XCTAssertNil(
             OnDeviceReadiness.blockedTranscriptionRoute(
-                .available(mode: mode, model: model), knownModels: [model], defaults: defaults, allowsCloud: true))
+                .available(mode: testMode, model: model), knownModels: [model], defaults: defaults, allowsCloud: true))
     }
 
     @MainActor
@@ -195,5 +195,10 @@ final class OnDeviceReadinessTests: XCTestCase {
     @MainActor
     func testNilConfigurationIsNotBlocked() {
         XCTAssertFalse(OnDeviceReadiness.transcriptionBlocked(nil, allowsCloud: false))
+    }
+
+    func testBlockedNoticeTitleNamesWhatToChoose() {
+        XCTAssertEqual(OnDeviceReadiness.blockedNoticeTitle(enhancementOnly: true), "Choose an on-device AI provider")
+        XCTAssertEqual(OnDeviceReadiness.blockedNoticeTitle(enhancementOnly: false), "Choose an on-device model")
     }
 }

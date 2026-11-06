@@ -568,9 +568,23 @@ class AIService: ObservableObject {
         }
     }
 
+    /// The verification result for a provider the on-device policy refuses, or nil when the
+    /// provider is allowed. A refused provider is never contacted.
+    nonisolated static func verificationRefusal(
+        for provider: AIProvider,
+        allowsCloud: Bool = ProviderPolicy.allowsCloud
+    ) -> (isValid: Bool, errorMessage: String?)? {
+        guard !ProviderPolicy.isAllowed(provider, allowsCloud: allowsCloud) else { return nil }
+        return (false, ProviderPolicyError.providerNotAllowed(provider.rawValue).errorDescription)
+    }
+
     func verifyAPIKey(_ key: String, for provider: AIProvider, model: String? = nil) async -> (
         isValid: Bool, errorMessage: String?
     ) {
+        if let refusal = Self.verificationRefusal(for: provider) {
+            return refusal
+        }
+
         guard provider.requiresAPIKey else {
             return (true, nil)
         }
@@ -632,7 +646,23 @@ class AIService: ObservableObject {
         }
     }
 
+    /// Whether a background Ollama probe (launch, mode settings) may contact `baseURL`.
+    /// On-device builds skip an unconfirmed remote host; the user confirms it from settings.
+    nonisolated static func ollamaBackgroundProbePermitted(
+        baseURL: String,
+        allowsCloud: Bool = ProviderPolicy.allowsCloud,
+        defaults: UserDefaults = .standard
+    ) -> Bool {
+        if allowsCloud { return true }
+        guard let url = URL(string: baseURL) else { return false }
+        return LocalEndpoint.isPermitted(url, allowsCloud: allowsCloud, defaults: defaults)
+    }
+
     func refreshOllamaAvailabilityInBackground() {
+        guard Self.ollamaBackgroundProbePermitted(baseURL: ollamaService.baseURL) else {
+            ollamaService.isConnected = false
+            return
+        }
         Task { [weak self] in
             guard let self else { return }
             _ = await self.refreshOllamaAvailability()
@@ -795,6 +825,7 @@ class AIService: ObservableObject {
 
     @MainActor
     func fetchOpenRouterModelsIfNeededForMigration() async {
+        guard ProviderPolicy.isAllowed(AIProvider.openRouter) else { return }
         guard openRouterModelCatalog.isEmpty,
             APIKeyManager.shared.hasAPIKey(forProvider: AIProvider.openRouter.rawValue)
         else {
@@ -806,6 +837,7 @@ class AIService: ObservableObject {
 
     @MainActor
     func fetchOpenRouterModels() async {
+        guard ProviderPolicy.isAllowed(AIProvider.openRouter) else { return }
         guard !isOpenRouterCatalogRefreshing else { return }
         isOpenRouterCatalogRefreshing = true
         defer { isOpenRouterCatalogRefreshing = false }

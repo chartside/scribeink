@@ -1,16 +1,16 @@
 import AppKit
 import Foundation
 
-/// The user-facing side of `ProviderPolicy`: decides when saved settings point at a
-/// provider this build does not allow, so recording can be blocked and enhancement
-/// skipped with a notice. It only reads settings. It never changes a setting and never
-/// reads an API key.
 /// The settings page that can clear a blocked transcription selection.
 enum BlockedTranscriptionRoute: Equatable {
     case modes
     case models
 }
 
+/// The user-facing side of `ProviderPolicy`: decides when saved settings point at a
+/// provider this build does not allow, so recording can be blocked and enhancement
+/// skipped with a notice. It only reads settings. It never changes a setting and never
+/// reads an API key.
 @MainActor
 enum OnDeviceReadiness {
     /// The key `TranscriptionModelManager` stores the global model selection under.
@@ -174,11 +174,19 @@ enum OnDeviceReadiness {
         return modeManager.getDefaultConfiguration() ?? modeManager.currentEffectiveConfiguration
     }
 
-    static func showBlockedNotice() {
+    static func showBlockedNotice(enhancementOnly: Bool = false) {
         NotificationManager.shared.showNotification(
-            title: String(localized: "Choose an on-device model"),
+            title: blockedNoticeTitle(enhancementOnly: enhancementOnly),
             type: .error
         )
+    }
+
+    /// Pure: the notice title. Only enhancement blocked asks for an AI provider; any
+    /// transcription block asks for a model.
+    nonisolated static func blockedNoticeTitle(enhancementOnly: Bool) -> String {
+        enhancementOnly
+            ? String(localized: "Choose an on-device AI provider")
+            : String(localized: "Choose an on-device model")
     }
 
     /// Recording is blocked: tell the user and open the settings page that can clear the block.
@@ -197,11 +205,11 @@ enum OnDeviceReadiness {
         guard !didShowLaunchNotice else { return }
         let modeManager = ModeManager.shared
         let defaultMode = modeManager.getDefaultConfiguration() ?? modeManager.currentEffectiveConfiguration
-        let isBlocked =
+        let isTranscriptionBlocked =
             transcriptionBlocked(mode: defaultMode, transcriptionModelManager: transcriptionModelManager)
-            || blockedEnhancementProvider(for: defaultMode) != nil
-        guard isBlocked else { return }
+        let isEnhancementBlocked = blockedEnhancementProvider(for: defaultMode) != nil
+        guard isTranscriptionBlocked || isEnhancementBlocked else { return }
         didShowLaunchNotice = true
-        showBlockedNotice()
+        showBlockedNotice(enhancementOnly: !isTranscriptionBlocked)
     }
 }

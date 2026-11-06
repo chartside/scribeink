@@ -61,7 +61,8 @@ enum OnboardingStage: String, CaseIterable {
         case .model:
             return String(localized: "Configure Transcription Model")
         case .api:
-            return String(localized: "Verify API Key")
+            return ProviderPolicy.allowsCloud
+                ? String(localized: "Verify API Key") : String(localized: "AI Enhancement")
         case .experience:
             return String(localized: "Experience VoiceInk")
         case .contextAwareness:
@@ -82,10 +83,15 @@ enum OnboardingStage: String, CaseIterable {
         case .model:
             return String(localized: "Use NVIDIA's Parakeet model locally, or connect a cloud transcription provider.")
         case .api:
-            return String(
-                localized:
-                    "VoiceInk uses LLMs to enhance transcripts and perform AI actions. Set up an API key before continuing."
-            )
+            return ProviderPolicy.allowsCloud
+                ? String(
+                    localized:
+                        "VoiceInk uses LLMs to enhance transcripts and perform AI actions. Set up an API key before continuing."
+                )
+                : String(
+                    localized:
+                        "VoiceInk uses an AI model on this Mac or a server you approve to enhance transcripts."
+                )
         case .experience:
             return String(localized: "Try a few short samples and see how VoiceInk works before you start.")
         case .contextAwareness:

@@ -142,4 +142,42 @@ final class ProviderPolicyTests: XCTestCase {
             url("http://192.168.1.20:11434")
         )
     }
+
+    func testVerificationRefusesDisallowedProvidersOnDevice() {
+        let refusal = AIService.verificationRefusal(for: .openRouter, allowsCloud: false)
+        XCTAssertEqual(refusal?.isValid, false)
+        XCTAssertEqual(
+            refusal?.errorMessage,
+            ProviderPolicyError.providerNotAllowed(AIProvider.openRouter.rawValue).errorDescription
+        )
+        XCTAssertNotNil(AIService.verificationRefusal(for: .localCLI, allowsCloud: false))
+        XCTAssertNil(AIService.verificationRefusal(for: .custom, allowsCloud: false))
+        XCTAssertNil(AIService.verificationRefusal(for: .ollama, allowsCloud: false))
+        XCTAssertNil(AIService.verificationRefusal(for: .openRouter, allowsCloud: true))
+    }
+
+    func testOllamaBackgroundProbeSkipsUnconfirmedHost() {
+        XCTAssertTrue(
+            AIService.ollamaBackgroundProbePermitted(
+                baseURL: "http://localhost:11434", allowsCloud: false, defaults: defaults))
+        XCTAssertFalse(
+            AIService.ollamaBackgroundProbePermitted(
+                baseURL: "http://192.168.1.20:11434", allowsCloud: false, defaults: defaults))
+        XCTAssertTrue(
+            AIService.ollamaBackgroundProbePermitted(
+                baseURL: "http://192.168.1.20:11434", allowsCloud: true, defaults: defaults))
+
+        LocalEndpoint.accept(host: "192.168.1.20", defaults: defaults)
+        XCTAssertTrue(
+            AIService.ollamaBackgroundProbePermitted(
+                baseURL: "http://192.168.1.20:11434", allowsCloud: false, defaults: defaults))
+    }
+
+    func testOnDeviceCustomEndpointDefaultsAreLoopback() throws {
+        try XCTSkipIf(ProviderPolicy.allowsCloud, "Cloud builds keep upstream's pre-filled values.")
+        XCTAssertTrue(LocalEndpoint.isLoopback(url(CustomEndpointDefaults.transcriptionEndpoint)))
+        XCTAssertTrue(LocalEndpoint.isLoopback(url(CustomEndpointDefaults.chatBaseURL)))
+        XCTAssertEqual(CustomEndpointDefaults.transcriptionModel, "")
+        XCTAssertEqual(CustomEndpointDefaults.chatModel, "")
+    }
 }
