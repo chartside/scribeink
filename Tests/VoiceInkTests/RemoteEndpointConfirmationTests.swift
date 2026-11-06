@@ -20,7 +20,7 @@ final class RemoteEndpointConfirmationTests: XCTestCase {
     }
 
     private func needs(_ urlString: String) -> String? {
-        RemoteEndpointConfirmation.hostNeedingConfirmation(for: urlString, defaults: defaults)
+        RemoteEndpointConfirmation.hostNeedingConfirmation(for: urlString, allowsCloud: false, defaults: defaults)
     }
 
     func testLoopbackNeedsNoConfirmation() {
@@ -70,9 +70,16 @@ final class RemoteEndpointConfirmationTests: XCTestCase {
 
     func testRemoteHostIgnoresAcceptance() {
         LocalEndpoint.accept(host: "192.168.1.20", defaults: defaults)
-        XCTAssertEqual(RemoteEndpointConfirmation.remoteHost(for: "http://192.168.1.20:11434"), "192.168.1.20")
-        XCTAssertNil(RemoteEndpointConfirmation.remoteHost(for: "http://localhost:11434"))
-        XCTAssertNil(RemoteEndpointConfirmation.remoteHost(for: ""))
+        XCTAssertEqual(RemoteEndpointConfirmation.remoteHost(for: "http://192.168.1.20:11434", allowsCloud: false), "192.168.1.20")
+        XCTAssertNil(RemoteEndpointConfirmation.remoteHost(for: "http://localhost:11434", allowsCloud: false))
+        XCTAssertNil(RemoteEndpointConfirmation.remoteHost(for: "", allowsCloud: false))
+    }
+
+    func testCloudBuildsNeverWarnOrLabel() {
+        XCTAssertNil(
+            RemoteEndpointConfirmation.hostNeedingConfirmation(
+                for: "http://192.168.1.20:11434", allowsCloud: true, defaults: defaults))
+        XCTAssertNil(RemoteEndpointConfirmation.remoteHost(for: "http://192.168.1.20:11434", allowsCloud: true))
     }
 
     func testCopy() {

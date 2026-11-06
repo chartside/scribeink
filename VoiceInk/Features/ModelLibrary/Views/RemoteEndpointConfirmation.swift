@@ -3,16 +3,24 @@ import SwiftUI
 /// Pure decisions behind the remote-endpoint warning. No UI, so it can be unit tested.
 enum RemoteEndpointConfirmation {
     /// The host to warn about before saving or probing `urlString`, or nil when no warning
-    /// is needed: the host is loopback, the user has already accepted it, or the string is
-    /// not a URL with a host (dispatch refuses those later, so there is nothing to confirm).
-    static func hostNeedingConfirmation(for urlString: String, defaults: UserDefaults = .standard) -> String? {
-        guard let host = remoteHost(for: urlString) else { return nil }
+    /// is needed: the build allows cloud providers (upstream behaviour, as in
+    /// `LocalEndpoint.isPermitted`), the host is loopback, the user has already accepted it,
+    /// or the string is not a URL with a host (dispatch refuses those later, so there is
+    /// nothing to confirm).
+    static func hostNeedingConfirmation(
+        for urlString: String,
+        allowsCloud: Bool = ProviderPolicy.allowsCloud,
+        defaults: UserDefaults = .standard
+    ) -> String? {
+        guard let host = remoteHost(for: urlString, allowsCloud: allowsCloud) else { return nil }
         return LocalEndpoint.acceptedHosts(defaults).contains(host) ? nil : host
     }
 
     /// The lower-cased host of `urlString` when it is a URL with a non-loopback host,
-    /// accepted or not. Nil for loopback, empty or malformed strings.
-    static func remoteHost(for urlString: String) -> String? {
+    /// accepted or not. Nil for loopback, empty or malformed strings, and always nil in
+    /// builds that allow cloud providers.
+    static func remoteHost(for urlString: String, allowsCloud: Bool = ProviderPolicy.allowsCloud) -> String? {
+        guard !allowsCloud else { return nil }
         let trimmed = urlString.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty,
             let url = URL(string: trimmed),
@@ -117,7 +125,7 @@ extension View {
 }
 
 /// "Remote: {host}" for a non-loopback endpoint. Renders nothing for loopback or
-/// malformed URLs.
+/// malformed URLs, or in builds that allow cloud providers.
 struct RemoteEndpointBadge: View {
     let urlString: String
 
