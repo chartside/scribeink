@@ -1,0 +1,72 @@
+# GP visit (SOAP by issue), version 1. Format: SCHEMA.md in this directory.
+# Subjective by issue, past medical history, objective, and assessment and plan by issue.
+# By design: each repeat-for-each-issue block is one numbered section; Objective is an exam
+# of what was said aloud; Assessment and Plan hold only what the clinician stated.
+template: soap_issues
+version: 1
+title: GP visit (SOAP by issue)
+sections:
+  - key: issues
+    title: Subjective
+    stated_only: false
+    format: numbered
+    guidance: >
+      An entry for each issue, problem or request the patient raised, with the issue named
+      first. Under each: why they came and the main complaint; the timing, place, quality
+      and context of the complaint as the patient described them; what makes it worse or
+      better, including what they tried themselves and how that went; how it has changed
+      over time; earlier episodes and how they were handled; how it affects daily
+      activities, work and life; and the other symptoms with it. In the patient's words
+      where possible.
+    style_example: |
+      Cough: began after a cold, worse at night, puffer helps a little; no fever
+      Low back pain: after lifting at work, eased by walking, no leg weakness
+  - key: history
+    title: Past medical history
+    stated_only: false
+    format: bullets
+    guidance: >
+      The history that bears on the reasons for the visit: past medical and surgical
+      history, tests and treatments so far, social history, family history, exposures and
+      immunisation history, and anything else the patient said that gives context.
+    style_example: |
+      - Asthma since childhood; appendix removed years ago
+      - Works in a warehouse; does not smoke
+      - Mother had high blood pressure
+      - Vaccines up to date, flu shot this autumn
+  - key: objective
+    title: Objective
+    stated_only: true
+    format: bullets
+    guidance: >
+      Only the examination findings and measurements the clinician said aloud, and the
+      results of tests already done that were said aloud. Write any number exactly as it was
+      said, and do not interpret it or compare it with anything. A test that is planned or
+      ordered belongs under the plan, not here. Each finding goes under the heading for its
+      system, as it was said. A system nobody examined aloud stays empty: do not write that
+      it was normal or unremarkable. Only what the clinician said aloud. If nothing was
+      said, leave this section empty. Do not add anything.
+    exam:
+      - {key: vitals, title: Vital signs}
+      - {key: general, title: General}
+      - {key: heent, title: Head and neck}
+      - {key: cvs, title: Cardiovascular}
+      - {key: resp, title: Respiratory}
+      - {key: abdo, title: Abdomen}
+      - {key: msk, title: Musculoskeletal}
+      - {key: neuro, title: Neurological}
+      - {key: skin, title: Skin}
+      - {key: mental_state, title: Mental state}
+      - {key: results, title: Results said aloud}
+      - {key: other, title: Other findings}
+  - key: assessment_plan
+    title: Assessment & Plan
+    stated_only: true
+    format: numbered
+    guidance: >
+      An entry for each issue the clinician named, with the issue named first, matching the
+      issue in the subjective part. Under each: the diagnosis the clinician stated, any
+      alternatives they said they were weighing, the tests they said are planned, the
+      treatment they said is planned, and the referrals they said were made. Only what the
+      clinician said aloud. If nothing was said, leave this section empty. Do not add
+      anything.
