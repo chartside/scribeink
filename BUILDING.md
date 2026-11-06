@@ -1,4 +1,4 @@
-# Building VoiceInk
+# Building ScribeInk
 
 ## Requirements
 
@@ -12,10 +12,10 @@
 git clone https://github.com/Beingpax/VoiceInk.git
 cd VoiceInk
 make local
-open ~/Downloads/VoiceInk.app
+open ~/Downloads/ScribeInk.app
 ```
 
-`make local` prepares `whisper.xcframework` in `~/VoiceInk-Dependencies`, builds Release in `.local-build`, and copies `VoiceInk.app` to `~/Downloads`.
+`make local` prepares `whisper.xcframework` in `~/VoiceInk-Dependencies`, builds Release in `.local-build`, and copies `ScribeInk.app` to `~/Downloads`.
 
 It uses `LocalBuild.xcconfig`, `VoiceInk.local.entitlements`, and the `LOCAL_BUILD` Swift flag. Without an override, it uses the only available Apple Development identity or falls back to ad-hoc signing when none or multiple are found.
 
@@ -48,8 +48,8 @@ Never use this build with real patient data or distribute it. The flag is not de
 - `make check` — verify required tools
 - `make whisper` — prepare `whisper.xcframework`
 - `make build` — build the standard Debug configuration
-- `make dev` — build and launch `VoiceInk Dev.app`
-- `make run` — launch `~/Downloads/VoiceInk.app`, or the first app found in DerivedData
+- `make dev` — build and launch `ScribeInk Dev.app`
+- `make run` — launch `~/Downloads/ScribeInk.app`, or the first app found in DerivedData
 - `make release` — create the signed release package
 - `make release-setup` — configure release notarization credentials
 - `make clean` — remove `~/VoiceInk-Dependencies`
@@ -62,7 +62,7 @@ make setup
 open VoiceInk.xcodeproj
 ```
 
-Select the `VoiceInk` scheme. Run builds `VoiceInk Dev.app`; Archive uses Release. `LOCAL_BUILD` applies only through `make local`.
+Select the `VoiceInk` scheme (Xcode target and scheme names stay `VoiceInk`). Run builds `ScribeInk Dev.app`; Archive builds `ScribeInk.app` (Release). `LOCAL_BUILD` applies only through `make local`.
 
 ## Troubleshooting
 

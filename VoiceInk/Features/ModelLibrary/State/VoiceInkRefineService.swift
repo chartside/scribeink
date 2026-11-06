@@ -70,7 +70,7 @@ final class VoiceInkRefineService: ObservableObject {
     }
 
     private let logger = Logger(
-        subsystem: "com.prakashjoshipax.voiceink",
+        subsystem: AppIdentity.loggerSubsystem,
         category: "VoiceInkRefineService"
     )
     private let modelRootDirectory: URL
@@ -94,7 +94,7 @@ final class VoiceInkRefineService: ObservableObject {
             in: .userDomainMask
         )[0]
         modelRootDirectory = appSupportDirectory
-            .appendingPathComponent("com.prakashjoshipax.VoiceInk")
+            .appendingPathComponent(AppIdentity.applicationSupportFolderName)
             .appendingPathComponent("VoiceInkRefine")
 
         refreshDownloadedState()

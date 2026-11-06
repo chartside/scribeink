@@ -2,7 +2,7 @@ import Foundation
 import OSLog
 
 actor AutoLearnPendingQueue {
-    private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "AutoLearnQueue")
+    private let logger = Logger(subsystem: AppIdentity.loggerSubsystem, category: "AutoLearnQueue")
     private enum ReviewStatus: String, Codable {
         case pending
         case reviewing
@@ -114,7 +114,7 @@ actor AutoLearnPendingQueue {
             in: .userDomainMask
         )[0]
         let resolvedQueueURL = fileURL ?? applicationSupport
-            .appendingPathComponent("com.prakashjoshipax.VoiceInk", isDirectory: true)
+            .appendingPathComponent(AppIdentity.applicationSupportFolderName, isDirectory: true)
             .appendingPathComponent("auto-learn-pending-corrections.json")
         queueFileURL = resolvedQueueURL
         self.archiveFileURL = archiveFileURL ?? resolvedQueueURL.deletingLastPathComponent()

@@ -18,7 +18,7 @@ enum AudioInputMode: String, CaseIterable {
 }
 
 class AudioDeviceManager: ObservableObject {
-    let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "AudioDeviceManager")
+    let logger = Logger(subsystem: AppIdentity.loggerSubsystem, category: "AudioDeviceManager")
     @Published var availableDevices: [(id: AudioDeviceID, uid: String, name: String)] = []
     @Published var selectedDeviceID: AudioDeviceID?
     @Published var inputMode: AudioInputMode = .custom
@@ -30,7 +30,7 @@ class AudioDeviceManager: ObservableObject {
     var clamshellStateMonitor: ClamshellStateMonitor?
     private var defaultInputDeviceListener: AudioObjectPropertyListenerBlock?
     private let channelDiscoveryQueue = DispatchQueue(
-        label: "com.prakashjoshipax.voiceink.audioChannelDiscovery", qos: .userInitiated)
+        label: AppIdentity.queueLabel("audioChannelDiscovery"), qos: .userInitiated)
 
     var isRecordingActive: Bool { recordingDeviceSession.isActive }
     var activeRecordingDeviceID: AudioDeviceID? { recordingDeviceSession.activeDeviceID }

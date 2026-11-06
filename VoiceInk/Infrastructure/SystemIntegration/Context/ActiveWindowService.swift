@@ -9,7 +9,7 @@ class ActiveWindowService: ObservableObject {
     private let browserURLService = BrowserURLService.shared
 
     private let logger = Logger(
-        subsystem: "com.prakashjoshipax.voiceink",
+        subsystem: AppIdentity.loggerSubsystem,
         category: "browser.detection"
     )
 
@@ -102,7 +102,7 @@ class ActiveWindowService: ObservableObject {
 
     /// Observed asynchronously after detection starts; it is not used to select a mode.
     private static func logFocusedWindow(processID: pid_t, diagnosticID: String) {
-        let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "browser.detection")
+        let logger = Logger(subsystem: AppIdentity.loggerSubsystem, category: "browser.detection")
         guard AXIsProcessTrusted() else {
             logger.notice("Mode window id=\(diagnosticID, privacy: .public) pid=\(processID, privacy: .public) result=unavailable reason=accessibility-not-trusted")
             return

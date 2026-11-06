@@ -86,7 +86,7 @@ final class SelectedTextCapture {
     private let pasteboard: any SelectionPasteboard
     private var copyInProgress = false
     private var unrestoredCopyChangeCount: Int?
-    private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "SelectedTextService")
+    private let logger = Logger(subsystem: AppIdentity.loggerSubsystem, category: "SelectedTextService")
 
     init(environment: SelectedTextCaptureEnvironment, pasteboard: any SelectionPasteboard) {
         self.environment = environment

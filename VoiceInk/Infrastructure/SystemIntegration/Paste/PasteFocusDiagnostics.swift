@@ -5,8 +5,8 @@ import os
 
 /// Best-effort metadata snapshots for every paste. Queries never hold up the paste command.
 final class PasteFocusDiagnostics: @unchecked Sendable {
-    private static let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "PasteFocusDiagnostics")
-    private static let queue = DispatchQueue(label: "com.prakashjoshipax.voiceink.paste-focus", qos: .utility)
+    private static let logger = Logger(subsystem: AppIdentity.loggerSubsystem, category: "PasteFocusDiagnostics")
+    private static let queue = DispatchQueue(label: AppIdentity.queueLabel("paste-focus"), qos: .utility)
     private static let messagingTimeout: Float = 0.02
 
     private struct Snapshot {

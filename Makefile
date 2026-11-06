@@ -4,11 +4,11 @@ WHISPER_CPP_DIR := $(DEPS_DIR)/whisper.cpp
 FRAMEWORK_PATH := $(WHISPER_CPP_DIR)/build-apple/whisper.xcframework
 LOCAL_DERIVED_DATA := $(CURDIR)/.local-build
 LOCAL_CODESIGN_IDENTITY ?=
-RUN_APP_NAME ?= VoiceInk
+RUN_APP_NAME ?= ScribeInk
 # Shared by `local` and `local-cloud`; local-cloud overrides these (see below).
 LOCAL_XCCONFIG := LocalBuild.xcconfig
 LOCAL_SWIFT_CONDITIONS := LOCAL_BUILD
-LOCAL_APP_NAME := VoiceInk
+LOCAL_APP_NAME := ScribeInk
 
 .PHONY: all clean whisper setup build local local-cloud check healthcheck help dev run release release-setup
 
@@ -16,7 +16,7 @@ LOCAL_APP_NAME := VoiceInk
 all: check build
 
 # Development workflow
-dev: RUN_APP_NAME = VoiceInk Dev
+dev: RUN_APP_NAME = ScribeInk Dev
 dev: build run
 
 # Prerequisites
@@ -56,7 +56,7 @@ build: setup
 
 # Build locally with stable Apple Development signing when available.
 local: check setup
-	@echo "Building VoiceInk for local use (no Apple Developer certificate required)..."
+	@echo "Building ScribeInk for local use (no Apple Developer certificate required)..."
 	@rm -rf "$(LOCAL_DERIVED_DATA)"
 	@SIGNING_IDENTITY="$(LOCAL_CODESIGN_IDENTITY)"; \
 	if [ -z "$$SIGNING_IDENTITY" ]; then \
@@ -88,7 +88,7 @@ local: check setup
 		-skipPackagePluginValidation \
 		-skipMacroValidation \
 		build
-	@APP_PATH="$(LOCAL_DERIVED_DATA)/Build/Products/Release/VoiceInk.app" && \
+	@APP_PATH="$(LOCAL_DERIVED_DATA)/Build/Products/Release/ScribeInk.app" && \
 	if [ -d "$$APP_PATH" ]; then \
 		echo "Copying $(LOCAL_APP_NAME).app to ~/Downloads..."; \
 		rm -rf "$$HOME/Downloads/$(LOCAL_APP_NAME).app"; \
@@ -102,7 +102,7 @@ local: check setup
 		echo "  - No iCloud dictionary sync"; \
 		echo "  - No automatic updates (pull new code and rebuild to update)"; \
 	else \
-		echo "Error: Could not find built VoiceInk.app at $$APP_PATH"; \
+		echo "Error: Could not find built ScribeInk.app at $$APP_PATH"; \
 		exit 1; \
 	fi
 
@@ -158,7 +158,7 @@ help:
 	@echo "  local              Build locally with stable signing when available"
 	@echo "    LOCAL_CODESIGN_IDENTITY=<SHA or name> overrides automatic Apple Development detection"
 	@echo "  local-cloud        Developer build with CLOUD_PROVIDERS defined (cloud providers compiled in)"
-	@echo "  run                Launch the built VoiceInk app"
+	@echo "  run                Launch the built ScribeInk app"
 	@echo "  dev                Build and run the app (for development)"
 	@echo "  release            Build DMG and Appcast using release-notes/<version>.html"
 	@echo "  release-setup      Store notarization credentials in Keychain"
