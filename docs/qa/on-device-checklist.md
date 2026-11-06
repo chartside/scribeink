@@ -31,6 +31,19 @@ build or run the app. These steps need macOS 15+ and Xcode.
 - [ ] Added: a custom transcription endpoint pointing at a loopback server that answers
   HTTP 307 with a remote `Location` fails. The redirect is refused.
 - [ ] Added: Test Connection on an unconfirmed remote host prompts for confirmation first.
+- [ ] Added: a new custom transcription model is pre-filled with
+  `http://localhost:8080/v1/audio/transcriptions` and an empty model name; a new custom
+  enhancement model with `http://localhost:11434/v1/chat/completions` and an empty model
+  name. No cloud URL is pre-filled. (In `make local-cloud` the upstream values return.)
+- [ ] Added: with a default mode whose transcription model or enhancement provider is
+  disallowed, the launch notice shows once per launch. If only enhancement is blocked it
+  reads "Choose an on-device AI provider"; otherwise "Choose an on-device model".
+- [ ] Added: with an Ollama URL set to a LAN host never confirmed (via `defaults write`),
+  launch makes no request to that host and Ollama shows as not connected.
+- [ ] Added (known limitation, see the spec's "Known limitations"): a loopback custom
+  chat or Ollama server answering HTTP 307 with a remote `Location` is followed, because
+  LLMkit accepts no redirect guard. Confirm this is still the case and record the result;
+  it is expected to fail until LLMkit or an in-app request path changes.
 
 ## Cloud developer build
 
@@ -40,3 +53,6 @@ build or run the app. These steps need macOS 15+ and Xcode.
 
 - [ ] Optional: watch outgoing connections (Little Snitch or `nettop`) during a dictation
   with Whisper and Refine. Nothing reaches a non-local host.
+- [ ] Added: with an OpenRouter key stored from an earlier cloud build and an empty cached
+  catalog, launch the default build while watching connections (Little Snitch or
+  `nettop`). Nothing reaches `openrouter.ai`.

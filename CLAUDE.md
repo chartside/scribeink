@@ -13,12 +13,18 @@ and nothing here should be copied from or synced with one.
    VoiceInk's cloud transcription providers (`Infrastructure/Providers/Transcription/Cloud/`)
    are compiled only under the `CLOUD_PROVIDERS` flag, which the default build leaves off
    (`make local-cloud` turns it on for development). The cloud enhancement/chat providers
-   stay compiled but are hidden in the UI and refused by `ProviderPolicy` at dispatch. Every
-   dispatch goes through `ProviderPolicy`; custom and Ollama endpoints go through
-   `LocalEndpoint` (remote hosts need confirmation) and `PermittedRedirectGuard` (refuses
-   redirects off the permitted host). `scripts/check-on-device.sh` enforces the cloud
-   transcription gating and the network host allowlist, and CI runs it on every PR. Treat
-   any new network call as a bug unless the operator approves it.
+   stay compiled but are hidden in the UI and refused by `ProviderPolicy` at dispatch.
+   Transcription and enhancement dispatch check `ProviderPolicy`; background work that
+   would reach a disallowed provider (the OpenRouter catalog fetch, API key verification)
+   is skipped. Custom and Ollama endpoints are checked against `LocalEndpoint` (remote
+   hosts need confirmation). `PermittedRedirectGuard` (refuses redirects off the permitted
+   host) covers only the custom transcription upload and its connection test. Known gap:
+   custom chat enhancement and Ollama go through LLMkit, whose request API takes no
+   `URLSession` or delegate, so a 307/308 from a permitted server is followed and the
+   request (with the transcript) is re-sent to the redirect host. Only point these at
+   servers you control; see the spec's "Known limitations". `scripts/check-on-device.sh`
+   enforces the cloud transcription gating and the network host allowlist, and CI runs it
+   on every PR. Treat any new network call as a bug unless the operator approves it.
 2. **No PHI in the repo.** Tests, fixtures, screenshots and logs use synthetic data only.
 3. **Never invent clinical content.** A note holds only what was said. See the template
    rules in `clinical-templates/README.md`.
@@ -52,7 +58,8 @@ still to build.
 
 Read `DESIGN.md` before any visual or UI change. It holds the colour tokens, type roles,
 component shapes and voice shared with WhiteCoat Prep. Don't introduce colours or fonts
-outside it without the operator's approval.
+outside it without the operator's approval. Until sub-project 2, existing `AppTheme` tokens
+are fine.
 
 ## Build
 

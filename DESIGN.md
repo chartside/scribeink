@@ -72,8 +72,8 @@ becomes `brand` at 14% opacity.
 ## Applying it to the macOS app (sub-project 2)
 
 - Define the colour tokens once, as named colours in the asset catalog (`Assets.xcassets`)
-  with light and dark variants, and reference them through a single `Color` extension in
-  the existing `DesignSystem/` folder. Never hard-code hex values in views.
+  with light and dark variants, and reference them by extending the existing `AppTheme`
+  in `DesignSystem/Theme/AppTheme.swift`. Never hard-code hex values in views.
 - Map the type roles to `Font` helpers in `DesignSystem/` (`.scribeTitle`, `.scribeBody`,
   `.scribeLabel`).
 - Upstream VoiceInk's accent colour and gradients are replaced, not mixed in.
