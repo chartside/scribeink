@@ -31,6 +31,7 @@ extension CloudProvider {
 }
 
 enum CloudProviderRegistry {
+    #if CLOUD_PROVIDERS
     static let allProviders: [any CloudProvider] = [
         GroqProvider(),
         ElevenLabsProvider(),
@@ -44,6 +45,10 @@ enum CloudProviderRegistry {
         CartesiaProvider(),
         OpenRouterProvider(),
     ]
+    #else
+    /// On-device builds compile no concrete cloud providers.
+    static let allProviders: [any CloudProvider] = []
+    #endif
 
     static func provider(for modelProvider: ModelProvider) -> (any CloudProvider)? {
         allProviders.first { $0.modelProvider == modelProvider }

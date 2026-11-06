@@ -1,3 +1,4 @@
+#if CLOUD_PROVIDERS
 import Foundation
 import LLMkit
 
@@ -52,3 +53,4 @@ struct SpeechmaticsProvider: CloudProvider {
         return await SpeechmaticsClient.verifyAPIKey(key)
     }
 }
+#endif

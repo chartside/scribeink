@@ -1,3 +1,4 @@
+#if CLOUD_PROVIDERS
 import Foundation
 import LLMkit
 
@@ -48,3 +49,4 @@ struct XAIProvider: CloudProvider {
         return await XAIClient.verifyAPIKey(key)
     }
 }
+#endif

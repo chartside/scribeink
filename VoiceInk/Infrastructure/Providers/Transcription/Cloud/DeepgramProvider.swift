@@ -1,3 +1,4 @@
+#if CLOUD_PROVIDERS
 import Foundation
 import LLMkit
 
@@ -79,3 +80,4 @@ struct DeepgramProvider: CloudProvider {
         return await DeepgramClient.verifyAPIKey(key)
     }
 }
+#endif

@@ -1,3 +1,4 @@
+#if CLOUD_PROVIDERS
 import Foundation
 import LLMkit
 
@@ -106,3 +107,4 @@ final class AssemblyAIStreamingProvider: StreamingTranscriptionProvider {
         }
     }
 }
+#endif

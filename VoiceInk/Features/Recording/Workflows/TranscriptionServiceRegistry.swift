@@ -14,7 +14,10 @@ class TranscriptionServiceRegistry {
         modelsDirectory: modelsDirectory,
         modelProvider: modelProvider
     )
+    #if CLOUD_PROVIDERS
     private(set) lazy var cloudTranscriptionService = CloudTranscriptionService()
+    #endif
+    private(set) lazy var customEndpointTranscriptionService = CustomEndpointTranscriptionService()
     private(set) lazy var nativeAppleTranscriptionService = NativeAppleTranscriptionService()
     private(set) lazy var fluidAudioTranscriptionService = FluidAudioTranscriptionService()
     private var cachedTranscribeCppTranscriptionService: TranscribeCppTranscriptionService?
@@ -44,8 +47,14 @@ class TranscriptionServiceRegistry {
             return transcribeCppTranscriptionService
         case .nativeApple:
             return nativeAppleTranscriptionService
+        case .custom:
+            return customEndpointTranscriptionService
         default:
+            #if CLOUD_PROVIDERS
             return cloudTranscriptionService
+            #else
+            return DeniedTranscriptionService()
+            #endif
         }
     }
 
@@ -90,3 +99,14 @@ class TranscriptionServiceRegistry {
         cachedTranscribeCppTranscriptionService?.cleanup()
     }
 }
+
+#if !CLOUD_PROVIDERS
+/// Backstop for on-device builds: any cloud provider that reaches the registry is refused.
+private struct DeniedTranscriptionService: TranscriptionService {
+    func transcribe(audioURL: URL, model: any TranscriptionModel, context: TranscriptionRequestContext) async throws
+        -> String
+    {
+        throw ProviderPolicyError.providerNotAllowed(model.provider.rawValue)
+    }
+}
+#endif

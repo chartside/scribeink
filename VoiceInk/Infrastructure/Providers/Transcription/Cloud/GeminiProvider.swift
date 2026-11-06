@@ -1,3 +1,4 @@
+#if CLOUD_PROVIDERS
 import Foundation
 import LLMkit
 
@@ -61,3 +62,4 @@ struct GeminiProvider: CloudProvider {
         return await GeminiTranscriptionClient.verifyAPIKey(key)
     }
 }
+#endif

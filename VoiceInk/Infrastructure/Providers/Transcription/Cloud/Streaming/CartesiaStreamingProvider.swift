@@ -1,3 +1,4 @@
+#if CLOUD_PROVIDERS
 import Foundation
 import LLMkit
 
@@ -122,3 +123,4 @@ final class CartesiaStreamingProvider: StreamingTranscriptionProvider {
         }
     }
 }
+#endif
