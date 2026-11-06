@@ -18,8 +18,6 @@ builds need Chartside's Apple team set first. `make local` builds work without i
 - [ ] Dev and Release installed together stay separate (`ScribeInk Dev`, `com.chartside.ScribeInk.dev`, and `ScribeInk`, `com.chartside.ScribeInk`): own settings, history, models, Keychain and log subsystem.
 - [ ] Onboarding shows the shortcut hint.
 - [ ] The About panel (ScribeInk menu > About ScribeInk) shows the attribution "ScribeInk is based on VoiceInk by Prakash Joshi Pax, licensed under GPL v3" (linking to github.com/Beingpax/VoiceInk), "Updates are not available yet." and the support link github.com/chartside/scribeink. It reads in light and dark.
-- [ ] No licence, trial or onboarding licence step appears anywhere.
-- [ ] `nettop` shows no traffic to `tryvoiceink.com`, `polar.sh` or `beingpax.github.io` during launch, onboarding, recording and idle.
 - [ ] `make local` produces `~/Downloads/ScribeInk.app`, and its data lands in `~/Library/Application Support/com.chartside.ScribeInk`.
 - [ ] Settings > General shows "Updates are not available yet." and no update controls.
 - [ ] The placeholder app icon and menu-bar glyph show (menu-bar glyph tints correctly in light and dark).

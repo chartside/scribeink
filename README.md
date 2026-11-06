@@ -11,8 +11,13 @@
 
 ScribeInk is Chartside's on-device clinical scribe for macOS. It turns a clinician's dictation or
 visit recording into text, and (as the roadmap lands) into a draft note for the clinician to
-review. Transcription and note generation run locally. Nothing is sent to a cloud service, and no
-audio, transcript, note or prompt leaves the device.
+review. ScribeInk is designed so that audio, transcripts, notes and prompts stay on the device:
+transcription and note generation run locally, and cloud providers are switched off. This is
+still being verified on a Mac (see the on-device checklist below).
+
+Known limitation: point custom and Ollama endpoints only at servers you control, because
+redirects from them are followed. See "Known limitations" in
+`docs/superpowers/specs/2026-11-06-on-device-only-design.md`.
 
 ScribeInk is open source under the GNU General Public License v3.0. Chartside's paid tiers
 (support, templates, compliance, EHR integrations) live outside this repository.

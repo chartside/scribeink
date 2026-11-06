@@ -85,7 +85,8 @@ def main():
     menu_dir = os.path.join(ASSETS, "menuBarIcon.imageset")
     with open(os.path.join(menu_dir, "Contents.json")) as f:
         menu_images = json.load(f)["images"]
-    # The imageset lists no pixel size; keep the existing 750x750 canvas.
+    # The imageset lists no pixel size. 750x750 matches the existing imageset canvas;
+    # the app sizes the glyph at runtime (22 pt high in the menu bar).
     for im in menu_images:
         menu_glyph(750, args.font).save(os.path.join(menu_dir, im["filename"]))
         print(f"menuBarIcon {im['filename']} 750x750")
