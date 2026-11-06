@@ -12,7 +12,7 @@ and nothing here should be copied from or synced with one.
    service. Transcription (whisper.cpp / Parakeet) and note generation run locally.
    VoiceInk's cloud transcription providers (`Infrastructure/Providers/Transcription/Cloud/`)
    are compiled only under the `CLOUD_PROVIDERS` flag, which the default build leaves off
-   (`make local-cloud` turns it on for development). The cloud enhancement/chat providers
+   (`make local-cloud` turns it on for development; that build shares all data with `make local`, so never run it on a machine that holds patient data). The cloud enhancement/chat providers
    stay compiled but are hidden in the UI and refused by `ProviderPolicy` at dispatch.
    Transcription and enhancement dispatch check `ProviderPolicy`; background work that
    would reach a disallowed provider (the OpenRouter catalog fetch, API key verification)
@@ -78,6 +78,9 @@ are fine.
   folder names, logger subsystems and queue labels. Don't hard-code them elsewhere.
 - `UpstreamServices` (`VoiceInk/Infrastructure/Privacy/UpstreamServices.swift`) switches the
   upstream updates, licensing, announcements and star prompt. All are off until roadmap item 4.
+- Parakeet (FluidAudio) model files live in a cache shared with VoiceInk
+  (`~/Library/Application Support/FluidAudio/Models`); deleting one in either app deletes it for
+  both. All other models, history, settings and Keychain items are separate.
 - Internal target, file and Swift type names stay `VoiceInk*` to keep upstream merges workable;
   only user-visible names change.
 - `scripts/check-scribeink-identity.sh` runs in CI (blocking) next to `check-on-device.sh`.

@@ -8,7 +8,7 @@ builds need Chartside's Apple team set first. `make local` builds work without i
 
 ## On a Mac
 
-- [ ] **Parallel install:** with both apps installed and running, each keeps its own settings, history, models and Keychain. Each shortcut triggers only its own app, and launch at login is independent.
+- [ ] **Parallel install:** with both apps installed and running, each keeps its own settings, history, Whisper/TranscribeCpp/Refine models and Keychain. Parakeet model files are the exception: they are shared with VoiceInk, so deleting one in either app removes it for both. Each shortcut triggers only its own app, and launch at login is independent.
 - [ ] **No upstream services:** "Check for updates" is gone, no licence or trial prompt appears, and no traffic goes to `tryvoiceink.com`, `polar.sh` or `beingpax.github.io` (watched with `nettop` or Little Snitch).
 - [ ] **About:** shows the attribution.
 - [ ] **Visual pass:** dashboard, settings, recorder and onboarding, in light and dark.

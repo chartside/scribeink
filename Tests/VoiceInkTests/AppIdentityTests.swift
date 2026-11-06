@@ -14,6 +14,20 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(AppIdentity.applicationSupportFolderName, AppIdentity.bundleIdentifier)
     }
 
+    func testBundleIdentifierIsScribeInk() {
+        XCTAssertTrue(
+            ["com.chartside.ScribeInk", "com.chartside.ScribeInk.dev"].contains(AppIdentity.bundleIdentifier)
+        )
+    }
+
+    func testLoggerSubsystemIsLowercasedBundleIdentifier() {
+        XCTAssertEqual(AppIdentity.loggerSubsystem, AppIdentity.bundleIdentifier.lowercased())
+    }
+
+    func testLocalKeychainServiceDerivesFromBundleIdentifier() {
+        XCTAssertEqual(AppIdentity.localKeychainService, AppIdentity.bundleIdentifier + ".Local")
+    }
+
     func testNoUpstreamIdentifier() {
         let values = [
             AppIdentity.bundleIdentifier,

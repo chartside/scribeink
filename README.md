@@ -32,7 +32,10 @@ notices are kept in the source files.
 
 ScribeInk is a parallel install: it uses its own bundle identifier (`com.chartside.ScribeInk`),
 settings, history, models and Keychain items, so it can run next to an existing VoiceInk
-without sharing data. The development build (`ScribeInk Dev`) is separate again. Internal
+without sharing data. One exception: Parakeet model files are kept in a shared cache
+(`~/Library/Application Support/FluidAudio/Models`), so ScribeInk and VoiceInk use the same
+copies, and deleting a Parakeet model in one app deletes it for the other. Whisper,
+TranscribeCpp and Refine models, history, settings and Keychain items stay separate. The development build (`ScribeInk Dev`) is separate again. Internal
 Xcode target, file and Swift type names stay `VoiceInk*` to keep upstream merges workable.
 
 ## Build
