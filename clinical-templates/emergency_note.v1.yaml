@@ -1,0 +1,96 @@
+# Emergency note (history, examination, impression and plan, reassessment), version 1.
+# Format: SCHEMA.md in this directory.
+# By design: age and gender are an identity section; there are no "if the patient says no
+# X, write no X" defaults and no default-normal examination; the symptom-by-system prompts
+# are one section; impression, plan and reassessment are stated_only.
+template: emergency_note
+version: 1
+title: Emergency note
+sections:
+  - key: patient
+    title: Patient
+    stated_only: false
+    format: narrative
+    guidance: >
+      The patient's name, age, gender and health number as they were said aloud, and the
+      main complaint they presented with.
+    identity: true
+  - key: history
+    title: Past history
+    stated_only: false
+    format: bullets
+    guidance: >
+      The past medical history, the past surgical history and the family history that was
+      mentioned, then the habits: smoking, drugs and alcohol, as they were said.
+  - key: medications
+    title: Medications
+    stated_only: false
+    format: bullets
+    guidance: >
+      The patient's medicines, with the dose and how often where they were said, and any
+      natural products.
+  - key: hpi
+    title: History of the present illness
+    stated_only: false
+    format: bullets
+    guidance: >
+      The main complaint as the patient described it: where, which way it spreads, what kind
+      it is, anything that eases or worsens it, and the events or symptoms in the patient's
+      words, written with commas in bullet points.
+    style_example: |
+      - Chest pain on the left, spreading to the arm, pressing, began while resting
+      - Short of breath, no cough
+  - key: related_symptoms
+    title: Related symptoms
+    stated_only: false
+    format: bullets
+    guidance: >
+      The symptoms that go with the main complaint, by system, each as the patient said it,
+      present or absent, in commas, each system on its own line: heart (chest pain,
+      shortness of breath, lying flat, waking breathless, leg swelling, palpitations,
+      fainting and what came before or after it), breathing (cough, phlegm and its colour or
+      amount, upper airway symptoms, coughing blood), clots (past clots, calf symptoms,
+      hormones, recent immobility, surgery or a cast), abdomen (nausea, vomiting, diarrhoea,
+      vomiting blood, black stool, red blood from the rectum, constipation, abdominal or
+      rectal pain, alcohol, anti-inflammatory medicines, urinary symptoms), genital and
+      urinary (urinary symptoms, flank or pelvic pain, discharge, partners, past infections,
+      bleeding, last period, possible pregnancy), nerves (headache, head injury, speech,
+      balance, swallowing, weakness, numbness, vision, confusion, neck pain), whole body
+      (fever, chills, aches, weight loss, swollen glands, sick contacts), eyes and ears,
+      nose and throat. A system the patient did not speak about is left out.
+  - key: examination
+    title: Physical examination
+    stated_only: true
+    format: bullets
+    guidance: >
+      The general appearance, the vital signs and the findings of the examination the
+      clinician said aloud. Write any number exactly as it was said. Each finding goes under
+      the heading for its system, as it was said. A system nobody examined aloud stays
+      empty: do not write that it was normal or unremarkable. Only what the clinician said
+      aloud. If nothing was said, leave this section empty. Do not add anything.
+    exam:
+      - {key: general, title: General appearance}
+      - {key: vitals, title: Vital signs}
+      - {key: heent, title: Head and neck}
+      - {key: heart, title: Heart}
+      - {key: lungs, title: Lungs}
+      - {key: abdo, title: Abdomen}
+      - {key: other, title: Other findings}
+  - key: impression_plan
+    title: Impression and plan
+    stated_only: true
+    format: bullets
+    guidance: >
+      The main diagnosis the clinician stated, with the reasoning they said, the other
+      diagnoses they stated with their reasoning, and the orders, medicines and imaging they
+      said, each in commas on a line. Only what the clinician said aloud. If nothing was
+      said, leave this section empty. Do not add anything.
+  - key: reassessment
+    title: Reassessment
+    stated_only: true
+    format: narrative
+    guidance: >
+      The date and time of the reassessment if they were said, how the clinician said the
+      patient's symptoms were on reassessment, any change in the examination, and any change
+      in the plan. Do not repeat the earlier plan. Only what the clinician said aloud. If
+      nothing was said, leave this section empty. Do not add anything.

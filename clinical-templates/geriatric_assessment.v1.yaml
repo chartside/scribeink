@@ -1,0 +1,133 @@
+# Comprehensive geriatric assessment, version 1. Format: SCHEMA.md in this directory.
+# By design: no yes-or-no default answers; no "include results even if normal"; headings
+# that name an assessment are reworded ("Reason for referral", "Function"); no fixed
+# opening sentence or medication counselling text (see "Standing text" in SCHEMA.md).
+template: geriatric_assessment
+version: 1
+title: Comprehensive geriatric assessment
+sections:
+  - key: reason
+    title: Reason for referral
+    stated_only: false
+    format: narrative
+    guidance: >
+      The reason for the referral or the visit, in a brief paragraph, and the source of any
+      collateral history that was obtained.
+  - key: history
+    title: History
+    stated_only: false
+    format: narrative
+    guidance: >
+      The history relevant to the visit, including the cognitive, functional and behavioural
+      history and how the concerns progressed up to the referral, as a flowing paragraph.
+  - key: cognition
+    title: Cognition
+    stated_only: false
+    format: bullets
+    guidance: >
+      The cognitive domains the patient, family or clinician said were affected, each as it
+      was said: short-term memory, speech and language, word finding, visual or perceptual
+      disturbances, executive function, social skills, attention; the mood and mood symptoms
+      in detail; depression and anxiety screening results as they were said; hallucinations
+      present or absent with the details given; and sleep concerns with the details given.
+    style_example: |
+      - Forgets recent conversations; repeats questions
+      - Trouble finding words
+      - Mood low at times
+      - No hallucinations
+      - Sleeps poorly
+  - key: falls_mobility
+    title: Falls and mobility
+    stated_only: false
+    format: bullets
+    guidance: >
+      Each of these as it was said, present or absent, with the details given: dizziness on
+      changing position, tremor, falls, a change in handwriting, a change in gait, and any
+      injury sustained.
+  - key: medical_history
+    title: Medical history
+    stated_only: false
+    format: narrative
+    guidance: >
+      The past medical history as a flowing paragraph, and any previous surgeries.
+  - key: function
+    title: Function
+    stated_only: false
+    format: bullets
+    guidance: >
+      The activities of daily living, the instrumental activities of daily living, mobility
+      and gait, the use of walking aids or other assistive devices, and the results of any
+      screening test such as the MMSE or MoCA, each as it was said, in a list.
+  - key: social_history
+    title: Social history
+    stated_only: false
+    format: bullets
+    guidance: >
+      The living situation, the support system, occupation and retirement status, and
+      alcohol, tobacco and substance use.
+  - key: geriatric_syndromes
+    title: Other geriatric syndromes
+    stated_only: false
+    format: bullets
+    guidance: >
+      Falls, weight changes, dietary intake, chronic pain and sleep issues, each as it was
+      said.
+  - key: physical_exam
+    title: Physical examination
+    stated_only: true
+    format: bullets
+    guidance: >
+      The vital signs, the general appearance and the examination findings the clinician
+      said aloud. Write any number exactly as it was said. Each finding goes under the
+      heading for its system, as it was said. A system nobody examined aloud stays empty: do
+      not write that it was normal or unremarkable. Only what the clinician said aloud. If
+      nothing was said, leave this section empty. Do not add anything.
+    exam:
+      - {key: vitals, title: Vital signs}
+      - {key: general, title: General appearance}
+      - {key: cvs, title: Cardiovascular}
+      - {key: resp, title: Respiratory}
+      - {key: abdo, title: Abdomen}
+      - {key: msk, title: Musculoskeletal}
+      - {key: neuro, title: Neurological}
+      - {key: other, title: Other findings}
+  - key: investigations
+    title: Investigations
+    stated_only: false
+    format: bullets
+    guidance: >
+      The neuroimaging findings and the relevant laboratory results, each as it was said,
+      with the date if one was said. Do not read, interpret or compare a value.
+  - key: impression
+    title: Impression
+    stated_only: true
+    format: narrative
+    guidance: >
+      The clinician's impression summarising the key findings and the diagnosis they stated,
+      as a flowing paragraph. Never invent or infer a diagnosis. Only what the clinician
+      said aloud. If nothing was said, leave this section empty. Do not add anything.
+  - key: plan
+    title: Plan and recommendations
+    stated_only: true
+    format: narrative
+    guidance: >
+      The management plan the clinician said, in a brief paragraph, and the referrals to
+      specialists or services they said. Only what the clinician said aloud. If nothing was
+      said, leave this section empty. Do not add anything.
+  - key: donepezil
+    title: Donepezil
+    stated_only: true
+    format: narrative
+    guidance: >
+      The decision the clinician said about donepezil and the counselling they said they
+      gave; if the decision was not to start it, the details of that decision. Only what the
+      clinician said aloud. If nothing was said, leave this section empty. Do not add
+      anything.
+  - key: follow_up
+    title: Follow-up
+    stated_only: true
+    format: narrative
+    guidance: >
+      The follow-up plan the clinician said, with the timing and the purpose. Only what the
+      clinician said aloud. If nothing was said, leave this section empty. Do not add
+      anything.

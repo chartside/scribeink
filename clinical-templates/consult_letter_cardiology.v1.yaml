@@ -1,0 +1,102 @@
+# Cardiology letter to the referring physician (with stress test findings), version 1.
+# Format: SCHEMA.md in this directory; declared correspondence (see "Document templates").
+# By design: no patient identity section, since in a letter the patient's identity is the
+# clinician's to complete from the chart.
+template: consult_letter_cardiology
+version: 1
+title: Cardiology letter to referrer
+document: correspondence
+purpose: >
+  The cardiologist's letter back to the referring physician: the reason for referral, the
+  history, examination and results discussed, and the plan the cardiologist said.
+sections:
+  - key: reason_for_referral
+    title: Reason for referral
+    stated_only: false
+    format: narrative
+    guidance: >
+      A brief description of the reason for the referral.
+  - key: history
+    title: History of presenting illness
+    stated_only: false
+    format: narrative
+    guidance: >
+      The history of the presenting illness, including the diagnosis, the treatment received
+      and any significant events or complications, and the symptoms reported as present or
+      absent. In paragraphs of full sentences.
+    style_example: |
+      Seen for tiredness on exertion over recent months. Has not had chest pain or fainting. Takes blood pressure medicine daily.
+  - key: social
+    title: Social history
+    stated_only: false
+    format: narrative
+    guidance: >
+      Occupation, smoking, alcohol and insurance coverage, in paragraphs of full sentences.
+  - key: pmh
+    title: Past medical history
+    stated_only: false
+    format: narrative
+    guidance: >
+      Relevant past medical conditions and surgeries, in paragraphs of full sentences.
+  - key: medications
+    title: Medications
+    stated_only: false
+    format: narrative
+    guidance: >
+      Current medicines with the dose and how often each is taken, in paragraphs of full
+      sentences.
+  - key: family
+    title: Family history
+    stated_only: false
+    format: narrative
+    guidance: >
+      Relevant family medical history, in paragraphs of full sentences.
+  - key: examination
+    title: Physical examination
+    stated_only: true
+    format: bullets
+    guidance: >
+      Each vital sign on its own line, then the findings by body system, each system in full
+      sentences. Write any number exactly as it was said. Each finding goes under the
+      heading for its system, as it was said. A system nobody examined aloud stays empty: do
+      not write that it was normal or unremarkable. Only what the clinician said aloud. If
+      nothing was said, leave this section empty. Do not add anything.
+    exam:
+      - {key: vitals, title: Vital signs}
+      - {key: general, title: General}
+      - {key: cvs, title: Cardiovascular}
+      - {key: resp, title: Respiratory}
+      - {key: abdo, title: Abdomen}
+      - {key: neuro, title: Neurological}
+      - {key: other, title: Other findings}
+  - key: labs
+    title: Laboratory investigations
+    stated_only: false
+    format: bullets
+    guidance: >
+      Relevant laboratory results, each on its own line as it was said, with the date, the
+      test name and the value. Do not read, interpret or compare a value.
+  - key: stress_test
+    title: Stress test findings
+    stated_only: false
+    format: bullets
+    guidance: >
+      Only when a stress test was mentioned: each finding on its own line as it was said,
+      such as the resting and highest heart rate, the total time, the work reached, any ECG
+      changes, the resting ECG and how the test was reported. Do not read, interpret or
+      compare a value.
+  - key: summary
+    title: Summary
+    stated_only: false
+    format: narrative
+    guidance: >
+      The key points discussed with the patient, including advice given, referrals made and
+      plans for follow-up, in paragraphs of full sentences.
+  - key: plan
+    title: Plan
+    stated_only: true
+    format: numbered
+    guidance: >
+      The plan the clinician said, including the medicines, referrals and tests ordered, as
+      a numbered list of full sentences. Only what the clinician said aloud. If nothing was
+      said, leave this section empty. Do not add anything.

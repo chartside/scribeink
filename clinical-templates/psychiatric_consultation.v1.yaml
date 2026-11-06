@@ -1,0 +1,115 @@
+# Psychiatric consultation, version 1. Format: SCHEMA.md in this directory.
+# By design: name, age, gender and ID number are one identity section; the ten-domain
+# mental status examination is an exam list on a stated_only section; the impression and
+# the treatment plan are stated_only and never ask for diagnoses "based on the assessment".
+template: psychiatric_consultation
+version: 1
+title: Psychiatric consultation
+sections:
+  - key: patient
+    title: Patient
+    stated_only: false
+    format: narrative
+    guidance: >
+      The patient's name, age, gender and health number as they were said aloud, and the
+      reason they were seen.
+    identity: true
+  - key: hpi
+    title: History of presenting illness
+    stated_only: false
+    format: narrative
+    guidance: >
+      The current issues: the reasons for the visit, the history of the presenting
+      complaints, the onset, duration and frequency of the symptoms, the triggers and what
+      eases them, and how the condition affects work, relationships and sleep, in a brief
+      paragraph.
+    style_example: |
+      Low mood and poor sleep for some months, worse after losing work. Struggles to concentrate at home. Spends more time alone.
+  - key: past_psychiatric
+    title: Past psychiatric history
+    stated_only: false
+    format: narrative
+    guidance: >
+      The past psychiatric history: treatments, hospital stays, psychotherapy, suicide
+      attempts and other mental health care, with the dates, the length of treatment and the
+      outcomes, as a flowing paragraph.
+  - key: past_medical
+    title: Past medical history
+    stated_only: false
+    format: narrative
+    guidance: >
+      Significant medical conditions, surgeries, chronic illnesses and hospital stays,
+      including those that bear on the patient's mental health, in paragraph format.
+  - key: medications
+    title: Medications
+    stated_only: false
+    format: bullets
+    guidance: >
+      Each current medicine, psychiatric or not, including over-the-counter drugs and herbal
+      supplements, with the name, dose, how often and the purpose where they were said, each
+      on its own line.
+  - key: substance_use
+    title: Substance use history
+    stated_only: false
+    format: narrative
+    guidance: >
+      Alcohol, tobacco, recreational drugs and misuse of prescribed drugs, with how often,
+      for how long and how much where they were said, any attempts to quit and any
+      complications, in paragraph format.
+  - key: family_psychiatric
+    title: Family psychiatric history
+    stated_only: false
+    format: narrative
+    guidance: >
+      Mental health conditions diagnosed in close or wider family, and any family history of
+      suicide, hospital stays or psychiatric treatment, in paragraph format.
+  - key: legal
+    title: Legal history
+    stated_only: false
+    format: narrative
+    guidance: >
+      Significant legal history, including arrests, convictions, prison, probation and
+      pending matters, and legal issues tied to mental health such as involuntary hospital
+      stays or guardianship, in paragraph format.
+  - key: mental_status
+    title: Mental status examination
+    stated_only: true
+    format: narrative
+    guidance: >
+      The clinician's observations and the patient's answers under each domain: appearance
+      (grooming, attire, posture), behaviour (agitation, restlessness, eye contact,
+      psychomotor activity), speech (rate, volume, tone, fluency), mood in the patient's
+      words, affect, thought process, thought content, cognition (orientation, memory,
+      attention, concentration), insight and judgement. Each finding goes under the heading
+      for its system, as it was said. A system nobody examined aloud stays empty: do not
+      write that it was normal or unremarkable. Only what the clinician said aloud. If
+      nothing was said, leave this section empty. Do not add anything.
+    exam:
+      - {key: appearance, title: Appearance}
+      - {key: behaviour, title: Behaviour}
+      - {key: speech, title: Speech}
+      - {key: mood, title: Mood}
+      - {key: affect, title: Affect}
+      - {key: thought_process, title: Thought process}
+      - {key: thought_content, title: Thought content}
+      - {key: cognition, title: Cognition}
+      - {key: insight, title: Insight}
+      - {key: judgement, title: Judgement}
+  - key: impression
+    title: Impression
+    stated_only: true
+    format: narrative
+    guidance: >
+      The clinician's impression as they stated it, including any diagnoses or alternatives
+      they said they were weighing, in a flowing paragraph. Only what the clinician said
+      aloud. If nothing was said, leave this section empty. Do not add anything.
+  - key: plan
+    title: Plan and recommendations
+    stated_only: true
+    format: bullets
+    guidance: >
+      The treatment plan the clinician said: medicine changes, psychotherapy, lifestyle
+      changes, referrals, how often follow-up visits will be, and the patient education
+      given such as medicine adherence or managing symptoms, as a list. Only what the
+      clinician said aloud. If nothing was said, leave this section empty. Do not add
+      anything.

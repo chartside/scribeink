@@ -1,0 +1,167 @@
+# Internal medicine, new patient, version 1. Format: SCHEMA.md in this directory.
+# History, past medical history, physical examination, investigations, impression and plan
+# by issue, and a patient summary. By design: the age is an identity section; the per-issue
+# blocks are numbered sections; the impression, alternatives, advice, tests, treatments and
+# referrals are one stated_only section; the patient-facing summary is stated_only throughout.
+template: internal_medicine_new
+version: 1
+title: "Internal medicine, new patient"
+sections:
+  - key: patient
+    title: Patient
+    stated_only: false
+    format: narrative
+    guidance: >
+      The patient's name, age, gender and health number as they were said aloud, and the
+      reason they were seen.
+    identity: true
+  - key: current_issues
+    title: Current issues
+    stated_only: false
+    format: narrative
+    guidance: >
+      The current issues or reasons for the visit, in full sentences as a paragraph.
+  - key: characteristics
+    title: Symptom characteristics
+    stated_only: false
+    format: narrative
+    guidance: >
+      The duration, timing, location, quality and context of the symptoms, in full
+      sentences.
+  - key: modifiers
+    title: Symptom modifiers and self-management
+    stated_only: false
+    format: narrative
+    guidance: >
+      The factors that affect the symptoms and the remedies tried, in full sentences.
+  - key: progression
+    title: Symptom progression
+    stated_only: false
+    format: narrative
+    guidance: >
+      How the symptoms have changed, in full sentences.
+  - key: previous_episodes
+    title: Previous episodes
+    stated_only: false
+    format: narrative
+    guidance: >
+      Earlier episodes with the timing, how they were managed and how they turned out, in
+      paragraph form.
+  - key: impact
+    title: Impact on daily activities
+    stated_only: false
+    format: narrative
+    guidance: >
+      The limits the symptoms put on daily activities, in full sentences.
+  - key: associated
+    title: Associated symptoms
+    stated_only: false
+    format: narrative
+    guidance: >
+      The other relevant symptoms that come with the main ones, in full sentences.
+  - key: pmh
+    title: Medical and surgical history
+    stated_only: false
+    format: bullets
+    guidance: >
+      Relevant conditions and procedures as bullet points.
+  - key: family
+    title: Family history
+    stated_only: false
+    format: narrative
+    guidance: >
+      The family medical background, summarised in paragraph form.
+  - key: social
+    title: Social history
+    stated_only: false
+    format: narrative
+    guidance: >
+      Lifestyle, substance use, living and occupational details, in paragraph form.
+  - key: allergies
+    title: Allergies and reactions
+    stated_only: false
+    format: bullets
+    guidance: >
+      Each allergen and its reaction.
+  - key: medications
+    title: Current medications
+    stated_only: false
+    format: bullets
+    guidance: >
+      Each current medicine with the dose and how often it is taken, where known.
+  - key: immunisation
+    title: Immunisation history
+    stated_only: false
+    format: bullets
+    guidance: >
+      The relevant vaccination history, as bullet points.
+  - key: other_history
+    title: Other relevant historical factors
+    stated_only: false
+    format: narrative
+    guidance: >
+      Any other historical factors that were mentioned, in full sentences.
+  - key: examination
+    title: Physical examination
+    stated_only: true
+    format: bullets
+    guidance: >
+      The vital signs as numbers exactly as they were said, and the examination findings by
+      system, line by line. Each finding goes under the heading for its system, as it was
+      said. A system nobody examined aloud stays empty: do not write that it was normal or
+      unremarkable. Only what the clinician said aloud. If nothing was said, leave this
+      section empty. Do not add anything.
+    exam:
+      - {key: vitals, title: Vital signs}
+      - {key: general, title: General}
+      - {key: heent, title: Head and neck}
+      - {key: cvs, title: Cardiovascular}
+      - {key: resp, title: Respiratory}
+      - {key: abdo, title: Abdomen}
+      - {key: msk, title: Musculoskeletal}
+      - {key: neuro, title: Neurological}
+      - {key: skin, title: Skin}
+      - {key: other, title: Other findings}
+  - key: investigations
+    title: Investigations
+    stated_only: false
+    format: bullets
+    guidance: >
+      Each completed investigation with a summary of its result as it was said, with the
+      date if one was said. Do not read, interpret or compare a value.
+  - key: impression_plan
+    title: Impression & Plan
+    stated_only: true
+    format: numbered
+    guidance: >
+      An entry for each issue, condition, request or concern the clinician named, with the
+      issue named first. Under each: the impression or diagnosis the clinician stated, the
+      alternatives they said they were weighing, the advice, counselling and safety
+      instructions they gave, the tests they said are planned, the treatments they said were
+      advised, prescribed or started, and the referrals they said were made. Only what the
+      clinician said aloud. If nothing was said, leave this section empty. Do not add
+      anything.
+  - key: patient_summary
+    title: Patient summary
+    stated_only: true
+    format: narrative
+    guidance: >
+      In plain words, a summary for the patient of each issue as it was said, with the key
+      takeaways or next steps for that issue. Only what the clinician said aloud. If nothing
+      was said, leave this section empty. Do not add anything.
+  - key: key_takeaways
+    title: Key takeaways
+    stated_only: true
+    format: bullets
+    guidance: >
+      In plain words, what the patient was told to do and any lifestyle advice that was
+      given, as short bullet points. Only what the clinician said aloud. If nothing was
+      said, leave this section empty. Do not add anything.
+  - key: next_steps
+    title: Next steps
+    stated_only: true
+    format: bullets
+    guidance: >
+      In plain words, the follow-up plans the clinician said and any symptoms the clinician
+      said to watch for. Only what the clinician said aloud. If nothing was said, leave this
+      section empty. Do not add anything.

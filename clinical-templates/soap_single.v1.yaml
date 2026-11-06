@@ -1,0 +1,167 @@
+# SOAP note (single issue), version 1. Format: SCHEMA.md in this directory.
+# By design: no "confirmed diagnosis or clinical impression" wording that invites the model
+# to name one; no default text; the plan items are stated_only.
+template: soap_single
+version: 1
+title: SOAP note (single issue)
+sections:
+  - key: reason_for_visit
+    title: Reason for visit
+    stated_only: false
+    format: bullets
+    guidance: >
+      The primary reason for the consultation: the symptoms, requests or concerns the
+      patient raised.
+  - key: characteristics
+    title: Symptom characteristics
+    stated_only: false
+    format: bullets
+    guidance: >
+      The duration, timing, location, quality and context of the complaint, as described.
+  - key: modifiers
+    title: Symptom modifiers and self-management
+    stated_only: false
+    format: bullets
+    guidance: >
+      What makes the symptoms worse or better, and any self-treatment and how it went.
+  - key: progression
+    title: Symptom progression
+    stated_only: false
+    format: bullets
+    guidance: >
+      How the symptoms have changed over time.
+  - key: previous_episodes
+    title: Previous episodes
+    stated_only: false
+    format: bullets
+    guidance: >
+      Earlier similar episodes, how they were managed and how they turned out.
+  - key: impact
+    title: Impact on daily activities
+    stated_only: false
+    format: bullets
+    guidance: >
+      How the issue affects daily functioning, including work, home and physical activity.
+  - key: associated
+    title: Associated symptoms
+    stated_only: false
+    format: bullets
+    guidance: >
+      Related or whole-body symptoms that come with the main complaint, present or absent as
+      the patient said.
+  - key: history
+    title: Medical and surgical history
+    stated_only: false
+    format: bullets
+    guidance: >
+      Past illnesses, surgeries, treatments and relevant findings that contribute to the
+      complaint.
+  - key: social
+    title: Social history
+    stated_only: false
+    format: bullets
+    guidance: >
+      Lifestyle, occupation, substance use and the social circumstances that bear on the
+      complaint.
+  - key: family
+    title: Family history
+    stated_only: false
+    format: bullets
+    guidance: >
+      Hereditary or family conditions that bear on the current presentation.
+  - key: exposure
+    title: Exposure history
+    stated_only: false
+    format: bullets
+    guidance: >
+      Occupational, travel or environmental exposures that bear on the complaint.
+  - key: immunisation
+    title: Immunisation history
+    stated_only: false
+    format: bullets
+    guidance: >
+      Immunisation status or the vaccines that were mentioned.
+  - key: other_subjective
+    title: Other relevant information
+    stated_only: false
+    format: bullets
+    guidance: >
+      Any other information the patient gave that provides useful context.
+  - key: examination
+    title: Vital signs and examination
+    stated_only: true
+    format: bullets
+    guidance: >
+      The measurements and examination findings the clinician said aloud, physical or mental
+      state. Write any number exactly as it was said, and do not interpret it or compare it
+      with anything. Each finding goes under the heading for its system, as it was said. A
+      system nobody examined aloud stays empty: do not write that it was normal or
+      unremarkable. Only what the clinician said aloud. If nothing was said, leave this
+      section empty. Do not add anything.
+    exam:
+      - {key: vitals, title: Vital signs}
+      - {key: general, title: General}
+      - {key: heent, title: Head and neck}
+      - {key: cvs, title: Cardiovascular}
+      - {key: resp, title: Respiratory}
+      - {key: abdo, title: Abdomen}
+      - {key: msk, title: Musculoskeletal}
+      - {key: neuro, title: Neurological}
+      - {key: skin, title: Skin}
+      - {key: mental_state, title: Mental state}
+      - {key: results, title: Results said aloud}
+      - {key: other, title: Other findings}
+  - key: investigations
+    title: Investigations
+    stated_only: false
+    format: bullets
+    guidance: >
+      Only completed investigations whose results were said. Each result as it was said,
+      with the date if one was said. A test that is planned or pending is not listed here.
+  - key: diagnosis
+    title: Diagnosis
+    stated_only: true
+    format: narrative
+    guidance: >
+      The diagnosis or impression the clinician stated, in their words. Only what the
+      clinician said aloud. If nothing was said, leave this section empty. Do not add
+      anything.
+  - key: alternatives
+    title: Alternatives being weighed
+    stated_only: true
+    format: bullets
+    guidance: >
+      Any alternative diagnoses the clinician said they were weighing. Only what the
+      clinician said aloud. If nothing was said, leave this section empty. Do not add
+      anything.
+  - key: counselling
+    title: Counselling and advice
+    stated_only: true
+    format: bullets
+    guidance: >
+      The advice, education or counselling the clinician gave during the visit. Only what
+      the clinician said aloud. If nothing was said, leave this section empty. Do not add
+      anything.
+  - key: tests_planned
+    title: Investigations planned
+    stated_only: true
+    format: bullets
+    guidance: >
+      The tests or procedures the clinician said would be ordered. Only what the clinician
+      said aloud. If nothing was said, leave this section empty. Do not add anything.
+  - key: treatment_planned
+    title: Treatment planned
+    stated_only: true
+    format: bullets
+    guidance: >
+      The medicines, therapies or interventions the clinician said they would start, change
+      or stop. Only what the clinician said aloud. If nothing was said, leave this section
+      empty. Do not add anything.
+  - key: other_actions
+    title: Referrals and follow-up
+    stated_only: true
+    format: bullets
+    guidance: >
+      The referrals, follow-up arrangements and involvement of other health workers the
+      clinician said. Only what the clinician said aloud. If nothing was said, leave this
+      section empty. Do not add anything.

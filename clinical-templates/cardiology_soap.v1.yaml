@@ -1,0 +1,95 @@
+# Cardiology SOAP, version 1. Format: SCHEMA.md in this directory.
+# Subjective, Objective, Assessment and Plan for a cardiology visit, one section per item.
+# By design: no "summary of findings and their implications" section (an implication is
+# the model's judgement); Assessment and Plan hold only what the clinician stated.
+template: cardiology_soap
+version: 1
+title: Cardiology SOAP
+sections:
+  - key: current_issues
+    title: Current cardiovascular issues
+    stated_only: false
+    format: bullets
+    guidance: >
+      The current heart and circulation issues, the reasons for the visit, the topics
+      discussed and the history of the presenting complaints.
+  - key: past_history
+    title: Past medical history
+    stated_only: false
+    format: bullets
+    guidance: >
+      Past medical history and previous heart or vessel surgeries.
+  - key: medications
+    title: Cardiovascular medications
+    stated_only: false
+    format: bullets
+    guidance: >
+      The heart and circulation medicines and herbal supplements that were mentioned.
+  - key: social
+    title: Social history
+    stated_only: false
+    format: bullets
+    guidance: >
+      The social history that bears on heart health.
+  - key: allergies
+    title: Allergies
+    stated_only: false
+    format: bullets
+    guidance: >
+      The allergies that were mentioned.
+  - key: examination
+    title: Vital signs and examination
+    stated_only: true
+    format: bullets
+    guidance: >
+      The vital signs (blood pressure, heart rate, breathing rate, temperature) and the
+      examination findings that bear on the heart and circulation, as the clinician said
+      them. Write any number exactly as it was said. Each finding goes under the heading for
+      its system, as it was said. A system nobody examined aloud stays empty: do not write
+      that it was normal or unremarkable. Only what the clinician said aloud. If nothing was
+      said, leave this section empty. Do not add anything.
+    exam:
+      - {key: vitals, title: Vital signs}
+      - {key: general, title: General}
+      - {key: cvs, title: Cardiovascular}
+      - {key: resp, title: Respiratory}
+      - {key: edema, title: Peripheral edema}
+      - {key: other, title: Other findings}
+  - key: results
+    title: Recent test results
+    stated_only: false
+    format: bullets
+    guidance: >
+      The results of recent heart and circulation tests, each as it was said, with the date
+      if one was said. Do not read, interpret or compare a value.
+  - key: assessment
+    title: Assessment
+    stated_only: true
+    format: bullets
+    guidance: >
+      The diagnosis the clinician stated for the heart or circulation issues, and any
+      alternatives they said they were weighing, in their words. Only what the clinician
+      said aloud. If nothing was said, leave this section empty. Do not add anything.
+  - key: treatment
+    title: Treatment plan
+    stated_only: true
+    format: bullets
+    guidance: >
+      The medicines, lifestyle changes and follow-up appointments the clinician said. Only
+      what the clinician said aloud. If nothing was said, leave this section empty. Do not
+      add anything.
+  - key: referrals
+    title: Referrals
+    stated_only: true
+    format: bullets
+    guidance: >
+      The referrals to other specialists or for further tests that the clinician said. Only
+      what the clinician said aloud. If nothing was said, leave this section empty. Do not
+      add anything.
+  - key: education
+    title: Patient education
+    stated_only: true
+    format: bullets
+    guidance: >
+      The teaching and counselling the clinician said they gave. Only what the clinician
+      said aloud. If nothing was said, leave this section empty. Do not add anything.
