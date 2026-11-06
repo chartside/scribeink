@@ -39,6 +39,12 @@ still to build.
 - Template-driven note generation from the transcript, using a local LLM.
 - Rename from VoiceInk to ScribeInk in the UI, bundle ID and app name (keep upstream attribution).
 
+## Design
+
+Read `DESIGN.md` before any visual or UI change. It holds the colour tokens, type roles,
+component shapes and voice shared with WhiteCoat Prep. Don't introduce colours or fonts
+outside it without the operator's approval.
+
 ## Build
 
 See `BUILDING.md` (`make local`). It needs macOS 15+ and Xcode, so it can't be built in a
