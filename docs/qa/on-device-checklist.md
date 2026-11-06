@@ -20,6 +20,9 @@ build or run the app. These steps need macOS 15+ and Xcode.
     has its own model. Test with a mode whose own transcription model is a cloud model
     (for example a Groq model). In that case the notice opens the Modes settings page.
 - [ ] A stale cloud enhancement selection pastes the raw transcript with the notice.
+- [ ] Added: in the default build, Local CLI is absent from the enhancement provider
+  settings, and a stale Local CLI selection in a mode is not used (enhancement is skipped
+  with the notice).
 - [ ] Setting Ollama to a LAN IP shows the warning. Cancel reverts. Continue shows
   "Remote: *host*".
   - Added: the warning appears on Connect/Refresh or Return, not on each keystroke.
