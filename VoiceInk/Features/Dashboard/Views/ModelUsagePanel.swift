@@ -107,7 +107,7 @@ private struct ModelUsageDistributionRow: View {
 
             VStack(alignment: .leading, spacing: 7) {
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Text(row.name)
+                    Text(VoiceInkRefineService.displayName(forStoredName: row.name))
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(AppTheme.Text.primary)
                         .lineLimit(1)

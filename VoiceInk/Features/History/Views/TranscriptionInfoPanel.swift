@@ -89,7 +89,7 @@ struct TranscriptionInfoPanel: View {
                     TranscriptionMetadataRow(
                         icon: "sparkles",
                         label: "Enhancement Model",
-                        value: aiModel
+                        value: VoiceInkRefineService.displayName(forStoredName: aiModel)
                     )
 
                     if let duration = transcription.enhancementDuration {

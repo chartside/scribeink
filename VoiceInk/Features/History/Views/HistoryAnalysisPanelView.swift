@@ -251,7 +251,7 @@ private struct HistoryPerformanceRow: View {
             ModelProviderIcon(modelName: row.name, kind: row.kind.modelInsightKind, size: 24)
 
             VStack(alignment: .leading, spacing: 3) {
-                Text(row.name)
+                Text(VoiceInkRefineService.displayName(forStoredName: row.name))
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(AppTheme.Text.primary)
                     .lineLimit(1)

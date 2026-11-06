@@ -25,8 +25,24 @@ enum VoiceInkRefineError: LocalizedError {
 final class VoiceInkRefineService: ObservableObject {
     static let shared = VoiceInkRefineService()
 
+    // Persisted identifiers (stored as the selected provider/model in mode
+    // configurations and transcriptions). Show the display names below instead.
     static let providerName = "VoiceInk Refine"
     static let modelName = "VoiceInk Refine V1"
+    static var displayProviderName: String { AIProvider.voiceInkRefine.displayName }
+    static var displayModelName: String { String(localized: "ScribeInk Refine V1") }
+
+    /// Maps a stored provider or model identifier to its user-facing name.
+    static func displayName(forStoredName name: String) -> String {
+        switch name {
+        case modelName:
+            return displayModelName
+        case providerName:
+            return displayProviderName
+        default:
+            return name
+        }
+    }
     static let systemPrompt = """
         Transform raw ASR input into polished text. Preserve the original meaning and tone. Handle punctuation, capitalization, and spoken formatting cues properly. Remove fillers, repetitions, false starts, and discarded self-corrections. Output only the final text.
         """

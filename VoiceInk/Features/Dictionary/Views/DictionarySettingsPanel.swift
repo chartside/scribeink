@@ -336,7 +336,7 @@ struct DictionarySettingsPanel: View {
         Picker("AI setup", selection: reviewProviderSelection) {
             Text("Local Auto-Learn").tag("")
             ForEach(reviewProviders, id: \.self) { provider in
-                Text(provider.rawValue).tag(provider.rawValue)
+                Text(provider.displayName).tag(provider.rawValue)
             }
             if !reviewerProvider.isEmpty,
                 !reviewProviders.contains(where: { $0.rawValue == reviewerProvider }) {

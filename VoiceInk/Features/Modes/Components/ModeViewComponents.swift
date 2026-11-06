@@ -383,9 +383,10 @@ struct ConfigurationRow: View {
 
                 if config.isAIEnhancementEnabled,
                     config.selectedAIProvider != AIProvider.localCLI.rawValue,
-                    let modelName = config.selectedAIModel,
-                    !modelName.isEmpty
+                    let storedModelName = config.selectedAIModel,
+                    !storedModelName.isEmpty
                 {
+                    let modelName = VoiceInkRefineService.displayName(forStoredName: storedModelName)
                     HStack(spacing: 4) {
                         Image(systemName: "cpu")
                             .font(.system(size: 10))
@@ -447,7 +448,7 @@ struct ConfigurationRow: View {
                             .font(.system(size: 10))
                         Text(
                             config.selectedAIProvider == AIProvider.voiceInkRefine.rawValue
-                                ? VoiceInkRefineService.providerName
+                                ? VoiceInkRefineService.displayProviderName
                                 : selectedPrompt?.title ?? "AI"
                         )
                             .font(.caption)

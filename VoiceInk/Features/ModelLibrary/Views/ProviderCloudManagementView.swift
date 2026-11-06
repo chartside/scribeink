@@ -18,7 +18,7 @@ struct CloudProviderManagementView: View {
 
         var descriptors = enhancementProviders.map { aiProvider in
             ProviderDescriptor(
-                displayName: aiProvider.rawValue,
+                displayName: aiProvider.displayName,
                 providerKey: aiProvider.rawValue,
                 aiProvider: aiProvider,
                 cloudProvider: matchingCloudProvider(for: aiProvider)
