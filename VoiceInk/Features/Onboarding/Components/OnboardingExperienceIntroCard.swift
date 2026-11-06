@@ -9,19 +9,33 @@ struct OnboardingExperienceIntroCard: View {
     @State private var isVisible = false
 
     var body: some View {
-        HStack(alignment: .center, spacing: 14) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(LocalizedStringKey(introText))
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundColor(AppTheme.Text.primary)
-                    .fixedSize(horizontal: false, vertical: true)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .center, spacing: 14) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(LocalizedStringKey(introText))
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundColor(AppTheme.Text.primary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                if showsShortcutControl {
+                    OnboardingShortcutSetupView(
+                        action: shortcutAction,
+                        onShortcutChanged: onShortcutChanged
+                    )
+                }
             }
 
-            if showsShortcutControl {
-                OnboardingShortcutSetupView(
-                    action: shortcutAction,
-                    onShortcutChanged: onShortcutChanged
+            if showsSharedShortcutHint {
+                Text(
+                    String(
+                        localized:
+                            "Using VoiceInk too? Choose a different shortcut so both apps don't record at once."
+                    )
                 )
+                .font(.system(size: 13))
+                .foregroundColor(AppTheme.Text.secondary)
+                .fixedSize(horizontal: false, vertical: true)
             }
         }
         .padding(.horizontal, 12)
@@ -48,5 +62,10 @@ struct OnboardingExperienceIntroCard: View {
 
     private var showsShortcutControl: Bool {
         step.showsShortcutControl
+    }
+
+    // ScribeInk installs alongside VoiceInk; both listen for global shortcuts.
+    private var showsSharedShortcutHint: Bool {
+        showsShortcutControl && step.usesPrimaryRecordingShortcut
     }
 }

@@ -33,10 +33,10 @@ struct AudioInputFailurePresentation {
         )
     }
 
-    private static let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "AudioInputFailure")
+    private static let logger = Logger(subsystem: AppIdentity.loggerSubsystem, category: "AudioInputFailure")
 
     private static func restartCoreAudio() {
-        let prompt = String(localized: "VoiceInk needs to restart macOS audio. Sound in all apps will cut out for a moment.")
+        let prompt = String(localized: "ScribeInk needs to restart macOS audio. Sound in all apps will cut out for a moment.")
             .replacingOccurrences(of: "\\", with: "\\\\")
             .replacingOccurrences(of: "\"", with: "\\\"")
         let process = Process()

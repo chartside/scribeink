@@ -85,9 +85,7 @@ struct InsightPeriodPicker: View {
 
 enum ModelLinks {
     static func openRecommendedModels() {
-        if let url = URL(string: "https://tryvoiceink.com/docs/recommended-models") {
-            NSWorkspace.shared.open(url)
-        }
+        NSWorkspace.shared.open(UpstreamServices.supportURL)
     }
 }
 
@@ -266,7 +264,7 @@ private struct ModelPreviewRowView: View {
             ModelProviderIcon(modelName: row.name, kind: row.kind, size: 22)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(row.name)
+                Text(VoiceInkRefineService.displayName(forStoredName: row.name))
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(AppTheme.Text.primary)
                     .lineLimit(1)

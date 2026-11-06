@@ -10,7 +10,7 @@ enum ViewType: String, CaseIterable, Identifiable {
     case audio = "Audio"
     case dictionary = "Dictionary"
     case settings = "Settings"
-    case license = "VoiceInk Pro"
+    case license = "ScribeInk Pro"
 
     var id: String { rawValue }
 }
@@ -32,6 +32,8 @@ final class MainWindowNavigation: ObservableObject {
     }
 
     func navigate(to destination: ViewType) {
+        // The licence page has no entry point while upstream licensing is off.
+        guard destination != .license || UpstreamServices.licensingEnabled else { return }
         selectedView = destination
     }
 
@@ -42,7 +44,7 @@ final class MainWindowNavigation: ObservableObject {
 }
 
 struct ContentView: View {
-    private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "ContentView")
+    private let logger = Logger(subsystem: AppIdentity.loggerSubsystem, category: "ContentView")
     private static let detailBackgroundTintOpacity = 0.50
     @EnvironmentObject private var navigation: MainWindowNavigation
 
@@ -108,7 +110,11 @@ struct ContentView: View {
         case .settings:
             SettingsView()
         case .license:
-            LicenseManagementView()
+            if UpstreamServices.licensingEnabled {
+                LicenseManagementView()
+            } else {
+                DashboardView()
+            }
         }
     }
 }

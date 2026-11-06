@@ -1,0 +1,24 @@
+# Allow-list for scripts/check-scribeink-identity.sh
+# Format: <path-glob><TAB><literal substring>
+#   A FAIL is suppressed when the file matches the glob AND the offending line
+#   (or, for xcstrings, the offending string) contains the literal.
+#   A bare <path-glob> with no literal exempts the whole file.
+# Globs use shell `case` matching, so `*` also crosses `/`.
+
+# Whole-file exemptions
+LICENSE
+docs/*
+
+# Attribution sentence (About screen), and upstream links
+*	ScribeInk is based on VoiceInk by Prakash Joshi Pax, licensed under GPL v3
+*	github.com/Beingpax
+
+# The XPC service's display name is never shown to users; it keeps its VoiceInk
+# identifier. The literal includes "= " and ";" so it cannot mask the app's own
+# CFBundleDisplayName lines ("VoiceInk Dev", VoiceInk).
+VoiceInk.xcodeproj/project.pbxproj	= VoiceInkRefineXPC;
+
+# Onboarding hint: ScribeInk installs next to VoiceInk, so it names it on purpose.
+# The xcstrings line covers the key Xcode extracts from it on the next build.
+VoiceInk/Features/Onboarding/Components/OnboardingExperienceIntroCard.swift	Using VoiceInk too? Choose a different shortcut so both apps don't record at once.
+VoiceInk/Localizable.xcstrings	Using VoiceInk too? Choose a different shortcut so both apps don't record at once.

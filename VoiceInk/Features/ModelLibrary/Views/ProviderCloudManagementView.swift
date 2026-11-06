@@ -18,7 +18,7 @@ struct CloudProviderManagementView: View {
 
         var descriptors = enhancementProviders.map { aiProvider in
             ProviderDescriptor(
-                displayName: aiProvider.rawValue,
+                displayName: aiProvider.displayName,
                 providerKey: aiProvider.rawValue,
                 aiProvider: aiProvider,
                 cloudProvider: matchingCloudProvider(for: aiProvider)
@@ -62,7 +62,7 @@ struct CloudProviderManagementView: View {
                 HStack(alignment: .firstTextBaseline, spacing: 4) {
                     Text("Cloud providers process audio and text under their own privacy policies.")
                         .foregroundStyle(.secondary)
-                    Link("Learn more", destination: URL(string: "https://tryvoiceink.com/privacy")!)
+                    Link("Learn more", destination: UpstreamServices.supportURL)
                 }
                 .font(.caption)
             }

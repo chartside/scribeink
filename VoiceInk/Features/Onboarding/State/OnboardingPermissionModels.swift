@@ -1,6 +1,15 @@
 import SwiftUI
 
 enum OnboardingStage: String, CaseIterable {
+    /// The licence step runs only with upstream licensing on, and never in local builds.
+    static var includesLicenseStep: Bool {
+        #if LOCAL_BUILD
+            return false
+        #else
+            return UpstreamServices.licensingEnabled
+        #endif
+    }
+
     case permissions
     case microphone
     case model
@@ -64,41 +73,41 @@ enum OnboardingStage: String, CaseIterable {
             return ProviderPolicy.allowsCloud
                 ? String(localized: "Verify API Key") : String(localized: "AI Enhancement")
         case .experience:
-            return String(localized: "Experience VoiceInk")
+            return String(localized: "Experience ScribeInk")
         case .contextAwareness:
-            return String(localized: "VoiceInk is Context-Aware")
+            return String(localized: "ScribeInk is Context-Aware")
         case .trust:
-            return String(localized: "VoiceInk is Open Source")
+            return String(localized: "ScribeInk is Open Source")
         case .license:
-            return String(localized: "Buy VoiceInk License")
+            return String(localized: "Buy ScribeInk License")
         }
     }
 
     var subtitle: String {
         switch self {
         case .permissions:
-            return String(localized: "Allow VoiceInk to work across all your apps.")
+            return String(localized: "Allow ScribeInk to work across all your apps.")
         case .microphone:
-            return String(localized: "Pick the microphone VoiceInk should use for recordings.")
+            return String(localized: "Pick the microphone ScribeInk should use for recordings.")
         case .model:
             return String(localized: "Use NVIDIA's Parakeet model locally, or connect a cloud transcription provider.")
         case .api:
             return ProviderPolicy.allowsCloud
                 ? String(
                     localized:
-                        "VoiceInk uses LLMs to enhance transcripts and perform AI actions. Set up an API key before continuing."
+                        "ScribeInk uses LLMs to enhance transcripts and perform AI actions. Set up an API key before continuing."
                 )
                 : String(
                     localized:
-                        "VoiceInk uses an AI model on this Mac or a server you approve to enhance transcripts."
+                        "ScribeInk uses an AI model on this Mac or a server you approve to enhance transcripts."
                 )
         case .experience:
-            return String(localized: "Try a few short samples and see how VoiceInk works before you start.")
+            return String(localized: "Try a few short samples and see how ScribeInk works before you start.")
         case .contextAwareness:
             return String(
-                localized: "VoiceInk can select the right mode from the app you are using and the rules you configure.")
+                localized: "ScribeInk can select the right mode from the app you are using and the rules you configure.")
         case .trust:
-            return String(localized: "VoiceInk is private by default. No data leaves your device unless you opt in.")
+            return String(localized: "ScribeInk is private by default. No data leaves your device unless you opt in.")
         case .license:
             return String(localized: "Activate an existing key, purchase a license, or start a 7-day free trial.")
         }
@@ -129,20 +138,20 @@ enum OnboardingPermissionKind: String, CaseIterable, Identifiable {
         case .microphone:
             return OnboardingPermissionDescriptor(
                 title: "Microphone",
-                subtitle: String(localized: "VoiceInk uses your microphone to capture your voice.")
+                subtitle: String(localized: "ScribeInk uses your microphone to capture your voice.")
             )
 
         case .accessibility:
             return OnboardingPermissionDescriptor(
                 title: String(localized: "Accessibility"),
-                subtitle: String(localized: "VoiceInk uses Accessibility to type transcriptions directly into any app.")
+                subtitle: String(localized: "ScribeInk uses Accessibility to type transcriptions directly into any app.")
             )
 
         case .screenRecording:
             return OnboardingPermissionDescriptor(
                 title: String(localized: "Screen Recording"),
                 subtitle: String(
-                    localized: "VoiceInk reads visible screen content to improve the accuracy of transcripts.")
+                    localized: "ScribeInk reads visible screen content to improve the accuracy of transcripts.")
             )
         }
     }

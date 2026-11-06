@@ -50,7 +50,7 @@ struct VoiceInkApp: App {
         AppAppearancePreference.applyStored()
         OnboardingV2Migration.prepareIfNeeded()
 
-        let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "Initialization")
+        let logger = Logger(subsystem: AppIdentity.loggerSubsystem, category: "Initialization")
         // Keep existing model order stable; append new models after synced entities.
         let schema = Schema([
             Transcription.self,
@@ -74,7 +74,7 @@ struct VoiceInkApp: App {
                     alert.messageText = String(localized: "Storage Warning")
                     alert.informativeText = String(
                         localized:
-                            "VoiceInk couldn't access its storage location. Your transcriptions will not be saved between sessions."
+                            "ScribeInk couldn't access its storage location. Your transcriptions will not be saved between sessions."
                     )
                     alert.alertStyle = .warning
                     alert.addButton(withTitle: String(localized: "OK"))
@@ -116,7 +116,7 @@ struct VoiceInkApp: App {
 
         // 1. Create modelsDirectory URL
         let appSupportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("com.prakashjoshipax.VoiceInk")
+            .appendingPathComponent(AppIdentity.applicationSupportFolderName)
         let modelsDirectory = appSupportDirectory.appendingPathComponent("WhisperModels")
 
         // 2. Create model managers
@@ -225,7 +225,7 @@ struct VoiceInkApp: App {
 
     private static func createPersistentContainer(schema: Schema, logger: Logger) throws -> ModelContainer {
         let appSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("com.prakashjoshipax.VoiceInk", isDirectory: true)
+            .appendingPathComponent(AppIdentity.applicationSupportFolderName, isDirectory: true)
 
         try? FileManager.default.createDirectory(at: appSupportURL, withIntermediateDirectories: true)
 
@@ -242,12 +242,12 @@ struct VoiceInkApp: App {
         )
 
         let dictionarySchema = Schema([VocabularyWord.self, WordReplacement.self])
-        // Dev shares the local stores but must never connect to CloudKit.
+        // Dev and local builds must never connect to CloudKit.
         #if DEBUG || LOCAL_BUILD
             let dictionaryCloudKit: ModelConfiguration.CloudKitDatabase = .none
         #else
             let dictionaryCloudKit: ModelConfiguration.CloudKitDatabase = .private(
-                "iCloud.com.prakashjoshipax.VoiceInk")
+                AppIdentity.iCloudContainerIdentifier)
         #endif
         let dictionaryConfig = ModelConfiguration(
             "dictionary",
@@ -293,7 +293,7 @@ struct VoiceInkApp: App {
     }
 
     var body: some Scene {
-        Window("VoiceInk", id: AppWindowID.main) {
+        Window("ScribeInk", id: AppWindowID.main) {
             Group {
                 if hasCompletedOnboardingV2 {
                     ContentView()
@@ -310,12 +310,14 @@ struct VoiceInkApp: App {
                         .environmentObject(enhancementService)
                         .modelContainer(container)
                         .onAppear {
-                            if enableAnnouncements {
+                            if UpstreamServices.announcementsEnabled && enableAnnouncements {
                                 AnnouncementsService.shared.start()
                             }
                             showLaunchRemindersIfNeeded()
 
-                            GitHubStarPromptCoordinator.shared.scheduleIfNeeded(modelContainer: container)
+                            if UpstreamServices.starPromptEnabled {
+                                GitHubStarPromptCoordinator.shared.scheduleIfNeeded(modelContainer: container)
+                            }
 
                             // Run due audio-only cleanup and schedule future checks when transcript cleanup is not managing retention.
                             if !UserDefaults.standard.bool(forKey: CleanupSettingsKeys.isTranscriptionCleanupEnabled)
@@ -372,7 +374,9 @@ struct VoiceInkApp: App {
                     for: [.applicationDidBecomeActive, .systemDidWake]
                 )
             ) { _ in
-                licenseViewModel.refreshLicenseState()
+                if UpstreamServices.licensingEnabled {
+                    licenseViewModel.refreshLicenseState()
+                }
             }
         }
         .windowStyle(.hiddenTitleBar)
@@ -381,7 +385,10 @@ struct VoiceInkApp: App {
         .commands {
             CommandGroup(replacing: .newItem) {}
 
-            CommandGroup(after: .appInfo) {
+            CommandGroup(replacing: .appInfo) {
+                Button("About ScribeInk") {
+                    AboutPanel.show()
+                }
                 CheckForUpdatesView(updaterViewModel: updaterViewModel)
             }
         }

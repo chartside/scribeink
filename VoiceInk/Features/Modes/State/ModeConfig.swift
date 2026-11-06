@@ -259,7 +259,7 @@ class ModeManager: ObservableObject {
     @Published var configurations: [ModeConfig] = []
     @Published var activeConfiguration: ModeConfig?
 
-    private let triggerLogger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "mode.triggers")
+    private let triggerLogger = Logger(subsystem: AppIdentity.loggerSubsystem, category: "mode.triggers")
 
     private let configKey = "modeConfigurationsV2"
     private let activeConfigIdKey = "activeConfigurationId"

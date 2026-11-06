@@ -71,7 +71,7 @@ struct DictionarySettingsView: View {
         AppScreenHeader(
             title: "Dictionary",
             infoMessage: dictionaryInfoMessage,
-            infoURL: "https://tryvoiceink.com/docs/auto-learn-dictionary"
+            infoURL: UpstreamServices.supportURL.absoluteString
         ) {
             HStack(spacing: 8) {
                 if hasAutoLearnFailure {

@@ -152,7 +152,7 @@ enum AutoLearnLocalReviewPolicy {
 }
 
 struct AutoLearnLocalReviewer: Sendable {
-    private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "AutoLearnLocalReview")
+    private let logger = Logger(subsystem: AppIdentity.loggerSubsystem, category: "AutoLearnLocalReview")
 
     func review(_ candidates: [AutoLearnReviewCandidate],
         reviewID: UUID = UUID()) async throws -> [AutoLearnReviewDecision] {

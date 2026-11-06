@@ -4,7 +4,7 @@ import SwiftUI
 import os
 
 struct DashboardContent: View {
-    private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "DashboardContent")
+    private let logger = Logger(subsystem: AppIdentity.loggerSubsystem, category: "DashboardContent")
     private static let fallbackDisplayName = String(localized: "there")
     private static let displayNameFontSize: CGFloat = 28
     private static let displayNameFontWeight: NSFont.Weight = .bold
@@ -271,7 +271,7 @@ struct DashboardContent: View {
             return String(localized: "View dashboard insights")
         }
 
-        return String(localized: "Continue using VoiceInk to unlock these stats.")
+        return String(localized: "Continue using ScribeInk to unlock these stats.")
     }
 
     private var insightsActionAccessibilityLabel: String {
@@ -495,10 +495,17 @@ struct DashboardContent: View {
 
     @ViewBuilder
     private var licenseStatusMessage: some View {
+        if UpstreamServices.licensingEnabled {
+            trialStatusMessage
+        }
+    }
+
+    @ViewBuilder
+    private var trialStatusMessage: some View {
         switch licenseState {
         case .unlicensed:
             TrialMessageView(
-                message: Text("Activate a license to continue using VoiceInk."),
+                message: Text("Activate a license to continue using ScribeInk."),
                 type: .licenseRequired,
                 onAddLicenseKey: onAddLicenseKey
             )
@@ -567,7 +574,7 @@ struct DashboardContent: View {
 
     private var footerActionsView: some View {
         HStack(alignment: .center, spacing: 12) {
-            if starPrompt.showsFooterStarButton {
+            if UpstreamServices.starPromptEnabled && starPrompt.showsFooterStarButton {
                 Button(action: { starPrompt.star() }) {
                     footerStarButtonLabel
                 }
@@ -744,7 +751,7 @@ struct DashboardContent: View {
 
     private var headerSubtitle: String {
         guard hasLoadedStatsSnapshot else {
-            return String(localized: "Pulling together your VoiceInk activity.")
+            return String(localized: "Pulling together your ScribeInk activity.")
         }
 
         guard statsSummary.totalCount > 0 else {
@@ -851,7 +858,7 @@ private struct DashboardAccessibilityReminder: View {
                     .foregroundStyle(.primary)
                     .lineLimit(1)
 
-                Text("Required for VoiceInk shortcuts and app-wide controls to work properly.")
+                Text("Required for ScribeInk shortcuts and app-wide controls to work properly.")
                     .font(.system(size: 11))
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
@@ -891,7 +898,7 @@ private struct DashboardNoModesReminder: View {
                     .foregroundStyle(.primary)
                     .lineLimit(1)
 
-                Text("VoiceInk needs at least one mode to record. Create one to start dictating.")
+                Text("ScribeInk needs at least one mode to record. Create one to start dictating.")
                     .font(.system(size: 11))
                     .foregroundStyle(.secondary)
                     .lineLimit(2)

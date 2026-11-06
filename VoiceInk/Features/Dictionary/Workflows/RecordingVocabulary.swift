@@ -4,7 +4,7 @@ import os
 
 /// An immutable vocabulary snapshot for a transcription or enhancement request.
 struct RecordingVocabulary: Sendable {
-    private static let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "VocabularyCorrection")
+    private static let logger = Logger(subsystem: AppIdentity.loggerSubsystem, category: "VocabularyCorrection")
 
     let terms: [String]
 

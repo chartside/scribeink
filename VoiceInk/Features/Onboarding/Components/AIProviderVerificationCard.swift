@@ -66,7 +66,7 @@ struct AIProviderVerificationCard: View {
             )
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(selectedProvider.rawValue)
+                Text(selectedProvider.displayName)
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundColor(AppTheme.Text.primary)
             }
@@ -104,7 +104,7 @@ struct AIProviderVerificationCard: View {
     private var apiKeyField: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .center) {
-                Text(String(format: String(localized: "%@ API Key"), selectedProvider.rawValue))
+                Text(String(format: String(localized: "%@ API Key"), selectedProvider.displayName))
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundColor(AppTheme.Text.primary)
 
@@ -226,7 +226,7 @@ struct AIProviderVerificationCard: View {
     }
 
     private var apiKeyPlaceholder: String {
-        String(format: String(localized: "Paste %@ API key"), selectedProvider.rawValue)
+        String(format: String(localized: "Paste %@ API key"), selectedProvider.displayName)
     }
 
     private var apiKeyURL: URL? {
@@ -237,7 +237,7 @@ struct AIProviderVerificationCard: View {
         verificationSucceeded = isSelectedProviderConnected
         verificationMessage =
             verificationSucceeded
-            ? String(format: String(localized: "%@ connection verified."), selectedProvider.rawValue)
+            ? String(format: String(localized: "%@ connection verified."), selectedProvider.displayName)
             : nil
         verificationDetailMessage = nil
 
@@ -283,7 +283,7 @@ struct AIProviderVerificationCard: View {
                     guard APIKeyManager.shared.saveAPIKey(key, forProvider: provider.rawValue) else {
                         verificationSucceeded = false
                         verificationMessage = String(
-                            localized: "The key worked, but VoiceInk could not save it securely.")
+                            localized: "The key worked, but ScribeInk could not save it securely.")
                         verificationDetailMessage = nil
                         onVerificationChanged()
                         return
@@ -295,7 +295,7 @@ struct AIProviderVerificationCard: View {
                     aiService.isAPIKeyValid = true
                     apiKey = ""
                     verificationMessage = String(
-                        format: String(localized: "%@ connection verified."), provider.rawValue)
+                        format: String(localized: "%@ connection verified."), provider.displayName)
                     verificationDetailMessage = nil
                     NotificationCenter.default.post(name: .aiProviderKeyChanged, object: nil)
                 } else {
@@ -357,7 +357,7 @@ private struct ProviderChoiceButton: View {
                 )
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(provider.rawValue)
+                    Text(provider.displayName)
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundColor(AppTheme.Text.primary)
                         .lineLimit(1)
@@ -381,7 +381,7 @@ private struct ProviderChoiceButton: View {
             .contentShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
         .buttonStyle(.plain)
-        .help(provider.rawValue)
+        .help(provider.displayName)
     }
 
 }

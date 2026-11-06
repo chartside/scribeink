@@ -97,7 +97,7 @@ extension Recorder {
             deviceManager.recordingDeviceChangeFinished()
             logger.error("Failed to switch recording devices: \(error, privacy: .public)")
             NotificationManager.shared.showNotification(
-                title: String(localized: "VoiceInk could not switch to another microphone."),
+                title: String(localized: "ScribeInk could not switch to another microphone."),
                 type: .error,
                 duration: 7.0
             )

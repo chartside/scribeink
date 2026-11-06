@@ -22,7 +22,7 @@ final class ShortcutEventTapThread: @unchecked Sendable {
             ready.signal()
             CFRunLoopRun()
         }
-        thread.name = "com.prakashjoshipax.voiceink.shortcut-event-tap"
+        thread.name = AppIdentity.queueLabel("shortcut-event-tap")
         thread.qualityOfService = .userInteractive
         thread.start()
         ready.wait()

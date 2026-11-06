@@ -9,7 +9,7 @@ final class PasteTextContextReader: @unchecked Sendable {
         let context: SmartPunctuation.Context
     }
 
-    private let queue = DispatchQueue(label: "com.prakashjoshipax.voiceink.paste-context", qos: .userInitiated)
+    private let queue = DispatchQueue(label: AppIdentity.queueLabel("paste-context"), qos: .userInitiated)
 
     func read(processID: pid_t) async -> Snapshot? {
         await withCheckedContinuation { continuation in

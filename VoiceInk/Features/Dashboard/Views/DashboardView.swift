@@ -15,7 +15,7 @@ struct DashboardView: View {
             onAddLicenseKey: navigateToLicenseManagement
         )
         .overlay(alignment: .bottomTrailing) {
-            if starPrompt.isVisible {
+            if UpstreamServices.starPromptEnabled && starPrompt.isVisible {
                 GitHubStarPromptCard(
                     isBusy: starPrompt.isStarring,
                     completionState: starPrompt.completionState,
@@ -33,10 +33,11 @@ struct DashboardView: View {
     }
 
     private func navigateToLicenseManagement() {
+        guard UpstreamServices.licensingEnabled else { return }
         NotificationCenter.default.post(
             name: .navigateToDestination,
             object: nil,
-            userInfo: ["destination": "VoiceInk Pro"]
+            userInfo: ["destination": "ScribeInk Pro"]
         )
     }
 }

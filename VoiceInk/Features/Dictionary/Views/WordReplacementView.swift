@@ -263,7 +263,7 @@ struct WordReplacementInfoPopover: View {
                     .font(.subheadline)
                     .foregroundColor(.secondary)
 
-                Text("Voicing, Voice ink, Voiceing")
+                Text("Scribing, Scribe ink, Scribe Inc")
                     .font(.callout)
                     .padding(8)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -299,7 +299,7 @@ struct WordReplacementInfoPopover: View {
                         Text("Replacement:")
                             .font(.caption)
                             .foregroundColor(.secondary)
-                        Text(verbatim: "https://tryvoiceink.com")
+                        Text(verbatim: UpstreamServices.supportURL.absoluteString)
                             .font(.callout)
                     }
                 }
@@ -313,7 +313,7 @@ struct WordReplacementInfoPopover: View {
                         Text("Original:")
                             .font(.caption)
                             .foregroundColor(.secondary)
-                        Text("Voicing, Voice ink")
+                        Text("Scribing, Scribe ink")
                             .font(.callout)
                     }
 
@@ -325,7 +325,7 @@ struct WordReplacementInfoPopover: View {
                         Text("Replacement:")
                             .font(.caption)
                             .foregroundColor(.secondary)
-                        Text("VoiceInk")
+                        Text("ScribeInk")
                             .font(.callout)
                     }
                 }

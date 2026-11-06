@@ -6,8 +6,8 @@ struct AutoLearnSectionHeader: View {
         HStack(spacing: 4) {
             Text("Auto Learn")
             InfoTip(
-                "VoiceInk learns from corrections you make to dictated text.",
-                learnMoreURL: "https://tryvoiceink.com/docs/auto-learn-dictionary"
+                "ScribeInk learns from corrections you make to dictated text.",
+                learnMoreURL: UpstreamServices.supportURL.absoluteString
             )
             .accessibilityLabel("Learn about Dictionary Auto Learn")
         }
@@ -336,7 +336,7 @@ struct DictionarySettingsPanel: View {
         Picker("AI setup", selection: reviewProviderSelection) {
             Text("Local Auto-Learn").tag("")
             ForEach(reviewProviders, id: \.self) { provider in
-                Text(provider.rawValue).tag(provider.rawValue)
+                Text(provider.displayName).tag(provider.rawValue)
             }
             if !reviewerProvider.isEmpty,
                 !reviewProviders.contains(where: { $0.rawValue == reviewerProvider }) {

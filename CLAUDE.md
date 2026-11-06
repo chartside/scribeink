@@ -12,7 +12,7 @@ and nothing here should be copied from or synced with one.
    service. Transcription (whisper.cpp / Parakeet) and note generation run locally.
    VoiceInk's cloud transcription providers (`Infrastructure/Providers/Transcription/Cloud/`)
    are compiled only under the `CLOUD_PROVIDERS` flag, which the default build leaves off
-   (`make local-cloud` turns it on for development). The cloud enhancement/chat providers
+   (`make local-cloud` turns it on for development; that build shares all data with `make local`, so never run it on a machine that holds patient data). The cloud enhancement/chat providers
    stay compiled but are hidden in the UI and refused by `ProviderPolicy` at dispatch.
    Transcription and enhancement dispatch check `ProviderPolicy`; background work that
    would reach a disallowed provider (the OpenRouter catalog fetch, API key verification)
@@ -50,9 +50,17 @@ still to build.
   Implemented: cloud transcription gated behind `CLOUD_PROVIDERS`; cloud enhancement
   refused by `ProviderPolicy` and hidden; pending verification on a Mac
   (`docs/qa/on-device-checklist.md`).
-- Medical vocabulary and a custom dictionary (drug names, anatomy, abbreviations).
-- Template-driven note generation from the transcript, using a local LLM.
-- Rename from VoiceInk to ScribeInk in the UI, bundle ID and app name (keep upstream attribution).
+Priority order set by the operator on 2026-11-06:
+
+1. Rename to ScribeInk as a parallel install next to VoiceInk, and apply `DESIGN.md`
+   (spec: `docs/superpowers/specs/2026-11-06-scribeink-identity-and-design.md`). Internal
+   Xcode target, file and Swift type names stay `VoiceInk*` to keep upstream merges
+   workable; only user-visible names change.
+2. Medical vocabulary and a custom dictionary (drug names, anatomy, abbreviations).
+3. Template-driven note generation from the transcript, using a local LLM.
+4. ScribeInk's own updates, licensing and announcements (replacing the upstream services
+   switched off in item 1).
+5. `scribeink-ios` on-device work.
 
 ## Design
 
@@ -60,6 +68,25 @@ Read `DESIGN.md` before any visual or UI change. It holds the colour tokens, typ
 component shapes and voice shared with WhiteCoat Prep. Don't introduce colours or fonts
 outside it without the operator's approval. Until sub-project 2, existing `AppTheme` tokens
 are fine.
+
+## Identity
+
+- Bundle IDs: `com.chartside.ScribeInk` (Release), `com.chartside.ScribeInk.dev` (Dev),
+  `com.chartside.ScribeInk.RefineXPC`, `com.chartside.ScribeInkTests`,
+  `com.chartside.ScribeInkUITests`. Product names: `ScribeInk` and `ScribeInk Dev`.
+- `AppIdentity` (`VoiceInk/App/Configuration/AppIdentity.swift`) is the only source of IDs,
+  folder names, logger subsystems and queue labels. Don't hard-code them elsewhere.
+- `UpstreamServices` (`VoiceInk/Infrastructure/Privacy/UpstreamServices.swift`) switches the
+  upstream updates, licensing, announcements and star prompt. All are off until roadmap item 4.
+- Parakeet (FluidAudio) model files live in a cache shared with VoiceInk
+  (`~/Library/Application Support/FluidAudio/Models`); deleting one in either app deletes it for
+  both. All other models, history, settings and Keychain items are separate.
+- Internal target, file and Swift type names stay `VoiceInk*` to keep upstream merges workable;
+  only user-visible names change.
+- `scripts/check-scribeink-identity.sh` runs in CI (blocking) next to `check-on-device.sh`.
+- About shows the GPL attribution (`VoiceInk/App/About/AboutPanel.swift`); keep it.
+- Placeholder icons come from `scripts/generate-placeholder-icons.py`. QA:
+  `docs/qa/scribeink-identity-checklist.md`.
 
 ## Build
 

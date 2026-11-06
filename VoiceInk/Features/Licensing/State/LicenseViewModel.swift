@@ -28,7 +28,7 @@ final class LicenseViewModel: ObservableObject {
 
     private let trialPeriodDays = 7
     private let polarService: any PolarServicing
-    private let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "LicenseViewModel")
+    private let logger = Logger(subsystem: AppIdentity.loggerSubsystem, category: "LicenseViewModel")
     private let userDefaults: UserDefaults
     private let licenseManager: any LicenseStoring
     private let now: () -> Date
@@ -73,6 +73,13 @@ final class LicenseViewModel: ObservableObject {
         self.automaticallyRetriesStorage = automaticallyRetriesStorage
         self.automaticallyRefreshesTime = automaticallyRefreshesTime
 
+        guard UpstreamServices.licensingEnabled else {
+            // Upstream licensing is off: fully licensed, no Keychain read, no Polar call.
+            isPersistentStateAvailable = true
+            licenseState = .licensed
+            return
+        }
+
         #if LOCAL_BUILD
             isPersistentStateAvailable = true
             licenseState = .licensed
@@ -88,6 +95,7 @@ final class LicenseViewModel: ObservableObject {
 
     @discardableResult
     func startTrial() -> Bool {
+        guard UpstreamServices.licensingEnabled else { return true }
         clearValidationMessage()
 
         if trialStartDate != nil {
@@ -115,7 +123,7 @@ final class LicenseViewModel: ObservableObject {
         case .unavailable:
             setStorageError(
                 String(
-                    localized: "VoiceInk couldn't start the trial because the macOS Keychain is unavailable. Quit and reopen VoiceInk. If the problem continues, restart your Mac."
+                    localized: "ScribeInk couldn't start the trial because the macOS Keychain is unavailable. Quit and reopen ScribeInk. If the problem continues, restart your Mac."
                 )
             )
             return false
@@ -123,6 +131,7 @@ final class LicenseViewModel: ObservableObject {
     }
 
     func refreshLicenseState() {
+        guard UpstreamServices.licensingEnabled else { return }
         if !isPersistentStateAvailable {
             retryPersistentStateLoad()
         } else {
@@ -131,12 +140,12 @@ final class LicenseViewModel: ObservableObject {
     }
 
     func retryPersistentStateLoad() {
-        guard !isPersistentStateAvailable else { return }
+        guard UpstreamServices.licensingEnabled, !isPersistentStateAvailable else { return }
         loadPersistentState()
     }
 
     func refreshTimeDependentState() {
-        guard isPersistentStateAvailable else { return }
+        guard UpstreamServices.licensingEnabled, isPersistentStateAvailable else { return }
         licenseState = resolvedState(at: now())
         scheduleStateRefreshIfNeeded()
     }
@@ -146,10 +155,11 @@ final class LicenseViewModel: ObservableObject {
     }
 
     var hasVerifiedLicense: Bool {
+        guard UpstreamServices.licensingEnabled else { return true }
         #if LOCAL_BUILD
-            true
+            return true
         #else
-            isPersistentStateAvailable && storedLicenseKey != nil && licenseState == .licensed
+            return isPersistentStateAvailable && storedLicenseKey != nil && licenseState == .licensed
         #endif
     }
 
@@ -166,7 +176,7 @@ final class LicenseViewModel: ObservableObject {
         switch licenseState {
         case .unlicensed, .trialExpired:
             return String(
-                format: String(localized: "Your trial has ended. Upgrade to VoiceInk Pro at %@"),
+                format: String(localized: "Your trial has ended. Upgrade to ScribeInk Pro at %@"),
                 "tryvoiceink.com/buy"
             )
         case .trial, .licensed:
@@ -175,6 +185,7 @@ final class LicenseViewModel: ObservableObject {
     }
 
     var diagnosticLicenseStatus: String {
+        guard UpstreamServices.licensingEnabled else { return "Licensing Off (Fully Licensed)" }
         if userDefaults.bool(forKey: pendingRemovalKey) {
             return "License Removed (Local Cleanup Pending)"
         }
@@ -195,13 +206,14 @@ final class LicenseViewModel: ObservableObject {
     }
 
     func openPurchaseLink() {
+        guard UpstreamServices.licensingEnabled else { return }
         if let url = URL(string: "https://tryvoiceink.com/buy") {
             NSWorkspace.shared.open(url)
         }
     }
 
     func validateLicense(_ submittedKey: String) async {
-        guard !isValidating else { return }
+        guard UpstreamServices.licensingEnabled, !isValidating else { return }
 
         if !isPersistentStateAvailable {
             retryPersistentStateLoad()
@@ -286,7 +298,7 @@ final class LicenseViewModel: ObservableObject {
                 code
             )
         } catch LicenseStorageError.failed {
-            setStorageError(String(localized: "VoiceInk couldn't save the license. Please try again."))
+            setStorageError(String(localized: "ScribeInk couldn't save the license. Please try again."))
         } catch let urlError as URLError {
             logger.error("🔑 License network error: \(urlError, privacy: .public)")
             validationMessage = String(
@@ -352,7 +364,7 @@ final class LicenseViewModel: ObservableObject {
     }
 
     func deactivateLicense() async {
-        guard !isDeactivating else { return }
+        guard UpstreamServices.licensingEnabled, !isDeactivating else { return }
 
         if !isPersistentStateAvailable {
             retryPersistentStateLoad()
@@ -378,7 +390,7 @@ final class LicenseViewModel: ObservableObject {
             }
             try clearStoredLicense(resetTrialAt: deactivationDate)
         } catch LicenseStorageError.failed {
-            setStorageError(String(localized: "VoiceInk couldn't remove the saved license. Please try again."))
+            setStorageError(String(localized: "ScribeInk couldn't remove the saved license. Please try again."))
         } catch {
             logger.error("🔑 License deactivation failed: \(error, privacy: .public)")
             validationSuccess = false
@@ -459,6 +471,8 @@ final class LicenseViewModel: ObservableObject {
     }
 
     private func resolvedState(at date: Date) -> LicenseState {
+        guard UpstreamServices.licensingEnabled else { return .licensed }
+
         #if LOCAL_BUILD
             return .licensed
         #endif
@@ -571,7 +585,7 @@ final class LicenseViewModel: ObservableObject {
     private var keychainUnavailableMessage: String {
         let recoveryMessage = String(
             localized:
-                "VoiceInk couldn't access the macOS Keychain. Quit and reopen VoiceInk. If the problem continues, restart your Mac."
+                "ScribeInk couldn't access the macOS Keychain. Quit and reopen ScribeInk. If the problem continues, restart your Mac."
         )
 
         guard let persistentStateErrorStatus else { return recoveryMessage }

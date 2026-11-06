@@ -6,7 +6,7 @@ import os
 
 /// Logs shortcut activity without typed text.
 enum ShortcutDiagnostics {
-    private static let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "ShortcutDiagnostics")
+    private static let logger = Logger(subsystem: AppIdentity.loggerSubsystem, category: "ShortcutDiagnostics")
     private static let errorTimes = OSAllocatedUnfairLock(initialState: [String: TimeInterval]())
 
     static func notice(_ message: String) {

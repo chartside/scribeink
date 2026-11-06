@@ -1,58 +1,53 @@
 <div align="center">
   <img src="VoiceInk/Assets.xcassets/AppIcon.appiconset/256-mac.png" width="180" height="180" />
-  <h1>VoiceInk</h1>
-  <p>Voice to text app for macOS to transcribe what you say to text almost instantly</p>
+  <h1>ScribeInk</h1>
+  <p>An on-device clinical scribe for macOS</p>
 
   [![License](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
   ![Platform](https://img.shields.io/badge/platform-macOS%2015.0%2B-brightgreen)
-  [![GitHub release (latest by date)](https://img.shields.io/github/v/release/Beingpax/VoiceInk)](https://github.com/Beingpax/VoiceInk/releases)
-  ![GitHub all releases](https://img.shields.io/github/downloads/Beingpax/VoiceInk/total)
-  ![GitHub stars](https://img.shields.io/github/stars/Beingpax/VoiceInk?style=social)
-  <p>
-    <a href="https://tryvoiceink.com">Website</a> •
-    <a href="https://www.youtube.com/@tryvoiceink">YouTube</a>
-  </p>
-
-  <a href="https://tryvoiceink.com">
-    <img src="https://img.shields.io/badge/Download%20Now-Latest%20Version-blue?style=for-the-badge&logo=apple" alt="Download VoiceInk" width="250"/>
-  </a>
 </div>
 
 ---
 
-VoiceInk is a native macOS application that transcribes what you say to text almost instantly. You can find all the information and download the app from [here](https://tryvoiceink.com). 
+ScribeInk is Chartside's on-device clinical scribe for macOS. It turns a clinician's dictation or
+visit recording into text, and (as the roadmap lands) into a draft note for the clinician to
+review. ScribeInk is designed so that audio, transcripts, notes and prompts stay on the device:
+transcription and note generation run locally, and cloud providers are switched off. This is
+still being verified on a Mac (see the on-device checklist below).
 
-![VoiceInk Mac App](https://github.com/user-attachments/assets/12367379-83e7-48a6-b52c-4488a6a04bba)
+Known limitation: point custom and Ollama endpoints only at servers you control, because
+redirects from them are followed. See "Known limitations" in
+`docs/superpowers/specs/2026-11-06-on-device-only-design.md`.
 
-After dedicating the past 5 months to developing this app, I've decided to open source it for the greater good. 
+ScribeInk is open source under the GNU General Public License v3.0. Chartside's paid tiers
+(support, templates, compliance, EHR integrations) live outside this repository.
 
-My goal is to make it **the most efficient and privacy-focused voice-to-text solution for macOS** that is a joy to use. While the source code is now open for experienced developers to build and contribute, purchasing a license helps support continued development and gives you access to automatic updates, priority support, and upcoming features.
+## Attribution
 
-## Features
+ScribeInk is based on VoiceInk by Prakash Joshi Pax, licensed under GPL v3. Upstream project:
+[github.com/Beingpax/VoiceInk](https://github.com/Beingpax/VoiceInk). Upstream copyright
+notices are kept in the source files.
 
-- 🎙️ **Accurate Transcription**: Local AI models that transcribe your voice to text with 99% accuracy, almost instantly
-- 🔒 **Privacy First**: 100% offline processing ensures your data never leaves your device
-- ⚡ **Modes**: Intelligent app detection automatically applies your perfect pre-configured settings based on the app/ URL you're on
-- 🧠 **Context Aware**: Smart AI that understands your screen content and adapts to the context
-- 🎯 **Global Shortcuts**: Configurable keyboard or mouse shortcuts for quick recording and push-to-talk functionality
-- 📝 **Personal Dictionary**: Train the AI to understand your unique terminology with custom words, industry terms, and smart text replacements
-- 🔄 **Smart Modes**: Instantly switch between AI-powered modes optimized for different writing styles and contexts
-- 🤖 **AI Assistant**: Built-in voice assistant mode for a quick chatGPT like conversational assistant
+## Installs next to VoiceInk
 
-## Get Started
+ScribeInk is a parallel install: it uses its own bundle identifier (`com.chartside.ScribeInk`),
+settings, history, models and Keychain items, so it can run next to an existing VoiceInk
+without sharing data. One exception: Parakeet model files are kept in a shared cache
+(`~/Library/Application Support/FluidAudio/Models`), so ScribeInk and VoiceInk use the same
+copies, and deleting a Parakeet model in one app deletes it for the other. Whisper,
+TranscribeCpp and Refine models, history, settings and Keychain items stay separate. The development build (`ScribeInk Dev`) is separate again. Internal
+Xcode target, file and Swift type names stay `VoiceInk*` to keep upstream merges workable.
 
-### Download
-Get the latest version with a free trial from [tryvoiceink.com](https://tryvoiceink.com). Your purchase helps me work on VoiceInk full-time and continuously improve it with new features and updates.
+## Build
 
-#### Homebrew
-Alternatively, you can install VoiceInk via `brew`:
+Requires macOS 15.0 or later and Xcode. From the repository root:
 
 ```shell
-brew install --cask voiceink
+make local
 ```
 
-### Build from Source
-As an open-source project, you can build VoiceInk yourself by following the instructions in [BUILDING.md](BUILDING.md). However, the compiled version includes additional benefits like automatic updates, priority support via Discord and email, and helps fund ongoing development.
+This produces `~/Downloads/ScribeInk.app`. See [BUILDING.md](BUILDING.md) for details,
+including signing. Signed distribution builds need Chartside's Apple developer team.
 
 ## Requirements
 
@@ -60,31 +55,21 @@ As an open-source project, you can build VoiceInk yourself by following the inst
 
 ## Documentation
 
-- [Building from Source](BUILDING.md) - Detailed instructions for building the project
-- [Contributing Guidelines](CONTRIBUTING.md) - How to contribute to VoiceInk
-- [Code of Conduct](CODE_OF_CONDUCT.md) - Our community standards
-
-## Contributing
-
-This project is **not accepting pull requests** at this time. You're welcome to fork and modify VoiceInk for your own use.
-
-You can still contribute by:
-- Reporting bugs via [issues](https://github.com/Beingpax/VoiceInk/issues)
-- Suggesting features or enhancements
-- Improving documentation via issues
-
-For more details, see our [Contributing Guidelines](CONTRIBUTING.md). For build instructions, see our [Building Guide](BUILDING.md).
-
-## License
-
-This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+- [CLAUDE.md](CLAUDE.md): project rules, identity, roadmap
+- [DESIGN.md](DESIGN.md): colour, type and component rules
+- [BUILDING.md](BUILDING.md): building from source
+- [On-device checklist](docs/qa/on-device-checklist.md): QA for the no-network rules
+- [Identity checklist](docs/qa/scribeink-identity-checklist.md): QA for the rename and attribution
+- [Contributing Guidelines](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md)
 
 ## Support
 
-If you encounter any issues or have questions, please:
-1. Check the existing issues in the GitHub repository
-2. Create a new issue if your problem isn't already reported
-3. Provide as much detail as possible about your environment and the problem
+Open an issue at [github.com/chartside/scribeink](https://github.com/chartside/scribeink).
+Never include patient information in an issue; use synthetic data only.
+
+## License
+
+GNU General Public License v3.0. See the [LICENSE](LICENSE) file.
 
 ## Acknowledgments
 
@@ -95,7 +80,7 @@ If you encounter any issues or have questions, please:
 - [SenseVoice Small](https://huggingface.co/FunAudioLLM/SenseVoiceSmall) by FunAudioLLM / Alibaba - Multilingual model available under the [FunASR Model Open Source License Agreement](https://github.com/modelscope/FunASR/blob/main/MODEL_LICENSE)
 
 ### Essential Dependencies
-- [Sparkle](https://github.com/sparkle-project/Sparkle) - Keeping VoiceInk up to date
+- [Sparkle](https://github.com/sparkle-project/Sparkle) - Update framework (switched off in ScribeInk until Chartside publishes its own updates)
 - [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts) - User-customizable keyboard shortcuts
 - [LaunchAtLogin](https://github.com/sindresorhus/LaunchAtLogin) - Launch at login functionality
 - [MediaRemoteAdapter](https://github.com/ejbills/mediaremote-adapter) - Media playback control during recording
@@ -105,4 +90,4 @@ If you encounter any issues or have questions, please:
 
 ---
 
-Made with ❤️ by Pax
+Original VoiceInk by Prakash Joshi Pax.
