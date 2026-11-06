@@ -56,6 +56,20 @@ enum ProviderPolicy {
         case .localCLI: return false
         }
     }
+
+    /// Dispatch guard: throws before any transcription work when the provider is not allowed.
+    static func requireAllowed(_ provider: ModelProvider, allowsCloud: Bool = ProviderPolicy.allowsCloud) throws {
+        guard isAllowed(provider, allowsCloud: allowsCloud) else {
+            throw ProviderPolicyError.providerNotAllowed(provider.rawValue)
+        }
+    }
+
+    /// Dispatch guard: throws before any AI request when the provider is not allowed.
+    static func requireAllowed(_ provider: AIProvider, allowsCloud: Bool = ProviderPolicy.allowsCloud) throws {
+        guard isAllowed(provider, allowsCloud: allowsCloud) else {
+            throw ProviderPolicyError.providerNotAllowed(provider.rawValue)
+        }
+    }
 }
 
 enum ProviderPolicyError: LocalizedError, Equatable {

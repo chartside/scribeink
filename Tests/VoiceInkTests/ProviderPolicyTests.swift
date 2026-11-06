@@ -95,11 +95,51 @@ final class ProviderPolicyTests: XCTestCase {
     }
 
     func testRequirePermittedThrows() {
-        XCTAssertThrowsError(try LocalEndpoint.requirePermitted(url("http://192.168.1.20"))) { error in
+        XCTAssertThrowsError(
+            try LocalEndpoint.requirePermitted(url("http://192.168.1.20"), allowsCloud: false, defaults: defaults)
+        ) { error in
             XCTAssertEqual(
                 error as? ProviderPolicyError,
                 ProviderPolicyError.remoteEndpointNotConfirmed(host: "192.168.1.20")
             )
         }
+    }
+
+    func testRequireAllowedThrowsForCloudOnDevice() {
+        XCTAssertThrowsError(try ProviderPolicy.requireAllowed(ModelProvider.groq, allowsCloud: false)) { error in
+            XCTAssertEqual(
+                error as? ProviderPolicyError,
+                ProviderPolicyError.providerNotAllowed(ModelProvider.groq.rawValue)
+            )
+        }
+        XCTAssertThrowsError(try ProviderPolicy.requireAllowed(AIProvider.openAI, allowsCloud: false)) { error in
+            XCTAssertEqual(
+                error as? ProviderPolicyError,
+                ProviderPolicyError.providerNotAllowed(AIProvider.openAI.rawValue)
+            )
+        }
+        XCTAssertNoThrow(try ProviderPolicy.requireAllowed(ModelProvider.whisper, allowsCloud: false))
+        XCTAssertNoThrow(try ProviderPolicy.requireAllowed(AIProvider.ollama, allowsCloud: false))
+    }
+
+    func testOllamaDispatchRefusesUnconfirmedHost() {
+        XCTAssertEqual(
+            try AIService.ollamaDispatchURL(allowsCloud: false, defaults: defaults),
+            url("http://localhost:11434")
+        )
+
+        defaults.set("http://192.168.1.20:11434", forKey: "ollamaBaseURL")
+        XCTAssertThrowsError(try AIService.ollamaDispatchURL(allowsCloud: false, defaults: defaults)) { error in
+            XCTAssertEqual(
+                error as? ProviderPolicyError,
+                ProviderPolicyError.remoteEndpointNotConfirmed(host: "192.168.1.20")
+            )
+        }
+
+        LocalEndpoint.accept(host: "192.168.1.20", defaults: defaults)
+        XCTAssertEqual(
+            try AIService.ollamaDispatchURL(allowsCloud: false, defaults: defaults),
+            url("http://192.168.1.20:11434")
+        )
     }
 }

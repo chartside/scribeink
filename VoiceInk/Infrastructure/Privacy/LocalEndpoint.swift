@@ -59,8 +59,12 @@ enum LocalEndpoint {
         return acceptedHosts(defaults).contains(host)
     }
 
-    static func requirePermitted(_ url: URL) throws {
-        guard isPermitted(url) else {
+    static func requirePermitted(
+        _ url: URL,
+        allowsCloud: Bool = ProviderPolicy.allowsCloud,
+        defaults: UserDefaults = .standard
+    ) throws {
+        guard isPermitted(url, allowsCloud: allowsCloud, defaults: defaults) else {
             throw ProviderPolicyError.remoteEndpointNotConfirmed(host: url.host ?? "")
         }
     }

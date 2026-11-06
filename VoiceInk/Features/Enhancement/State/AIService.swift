@@ -712,6 +712,21 @@ class AIService: ObservableObject {
         }
     }
 
+    /// The Ollama base URL to dispatch to, after the on-device host check.
+    /// Reads `ollamaBaseURL` (default `OllamaService.defaultBaseURL`) and throws
+    /// `ProviderPolicyError.remoteEndpointNotConfirmed` for an unconfirmed non-loopback host.
+    nonisolated static func ollamaDispatchURL(
+        allowsCloud: Bool = ProviderPolicy.allowsCloud,
+        defaults: UserDefaults = .standard
+    ) throws -> URL {
+        let stored = defaults.string(forKey: "ollamaBaseURL") ?? OllamaService.defaultBaseURL
+        guard let url = URL(string: stored) else {
+            throw LocalAIError.invalidURL
+        }
+        try LocalEndpoint.requirePermitted(url, allowsCloud: allowsCloud, defaults: defaults)
+        return url
+    }
+
     func enhanceWithOllama(
         text: String,
         systemPrompt: String,
@@ -719,7 +734,12 @@ class AIService: ObservableObject {
         timeout: TimeInterval = 30,
         retryOnTimeout: Bool = false
     ) async throws -> String {
-        try await ollamaService.enhance(
+        _ = try Self.ollamaDispatchURL()
+        // The service keeps its own copy of the base URL; check that one too in case it differs.
+        if let serviceURL = URL(string: ollamaService.baseURL) {
+            try LocalEndpoint.requirePermitted(serviceURL)
+        }
+        return try await ollamaService.enhance(
             text,
             withSystemPrompt: systemPrompt,
             model: model,
