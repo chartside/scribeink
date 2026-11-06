@@ -1,0 +1,7 @@
+// CloudBuild.xcconfig
+// Developer-only build that compiles in the optional cloud providers.
+// Applied only by `make local-cloud`; default builds never define CLOUD_PROVIDERS.
+
+#include "LocalBuild.xcconfig"
+
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) LOCAL_BUILD CLOUD_PROVIDERS

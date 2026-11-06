@@ -5,8 +5,12 @@ FRAMEWORK_PATH := $(WHISPER_CPP_DIR)/build-apple/whisper.xcframework
 LOCAL_DERIVED_DATA := $(CURDIR)/.local-build
 LOCAL_CODESIGN_IDENTITY ?=
 RUN_APP_NAME ?= VoiceInk
+# Shared by `local` and `local-cloud`; local-cloud overrides these (see below).
+LOCAL_XCCONFIG := LocalBuild.xcconfig
+LOCAL_SWIFT_CONDITIONS := LOCAL_BUILD
+LOCAL_APP_NAME := VoiceInk
 
-.PHONY: all clean whisper setup build local check healthcheck help dev run release release-setup
+.PHONY: all clean whisper setup build local local-cloud check healthcheck help dev run release release-setup
 
 # Default target
 all: check build
@@ -74,25 +78,25 @@ local: check setup
 	fi; \
 	xcodebuild -project VoiceInk.xcodeproj -scheme VoiceInk -configuration Release \
 		-derivedDataPath "$(LOCAL_DERIVED_DATA)" \
-		-xcconfig LocalBuild.xcconfig \
+		-xcconfig $(LOCAL_XCCONFIG) \
 		CODE_SIGN_IDENTITY="$$SIGNING_IDENTITY" \
 		CODE_SIGNING_REQUIRED="$$SIGNING_REQUIRED" \
 		CODE_SIGNING_ALLOWED=YES \
 		DEVELOPMENT_TEAM="" \
 		CODE_SIGN_ENTITLEMENTS="$(CURDIR)/VoiceInk/VoiceInk.local.entitlements" \
-		SWIFT_ACTIVE_COMPILATION_CONDITIONS='$$(inherited) LOCAL_BUILD' \
+		SWIFT_ACTIVE_COMPILATION_CONDITIONS='$$(inherited) $(LOCAL_SWIFT_CONDITIONS)' \
 		-skipPackagePluginValidation \
 		-skipMacroValidation \
 		build
 	@APP_PATH="$(LOCAL_DERIVED_DATA)/Build/Products/Release/VoiceInk.app" && \
 	if [ -d "$$APP_PATH" ]; then \
-		echo "Copying VoiceInk.app to ~/Downloads..."; \
-		rm -rf "$$HOME/Downloads/VoiceInk.app"; \
-		ditto "$$APP_PATH" "$$HOME/Downloads/VoiceInk.app"; \
-		xattr -cr "$$HOME/Downloads/VoiceInk.app"; \
+		echo "Copying $(LOCAL_APP_NAME).app to ~/Downloads..."; \
+		rm -rf "$$HOME/Downloads/$(LOCAL_APP_NAME).app"; \
+		ditto "$$APP_PATH" "$$HOME/Downloads/$(LOCAL_APP_NAME).app"; \
+		xattr -cr "$$HOME/Downloads/$(LOCAL_APP_NAME).app"; \
 		echo ""; \
-		echo "Build complete! App saved to: ~/Downloads/VoiceInk.app"; \
-		echo "Run with: open ~/Downloads/VoiceInk.app"; \
+		echo "Build complete! App saved to: ~/Downloads/$(LOCAL_APP_NAME).app"; \
+		echo "Run with: open ~/Downloads/$(LOCAL_APP_NAME).app"; \
 		echo ""; \
 		echo "Limitations of local builds:"; \
 		echo "  - No iCloud dictionary sync"; \
@@ -101,6 +105,13 @@ local: check setup
 		echo "Error: Could not find built VoiceInk.app at $$APP_PATH"; \
 		exit 1; \
 	fi
+
+# Developer-only build with the CLOUD_PROVIDERS compilation condition. Same recipe as
+# `local`, with its variables overridden. Never distribute this build.
+local-cloud: LOCAL_XCCONFIG = CloudBuild.xcconfig
+local-cloud: LOCAL_SWIFT_CONDITIONS = LOCAL_BUILD CLOUD_PROVIDERS
+local-cloud: LOCAL_APP_NAME = ScribeInk Cloud Dev
+local-cloud: local
 
 # Run application
 run:
@@ -146,6 +157,7 @@ help:
 	@echo "  build              Build the VoiceInk Xcode project"
 	@echo "  local              Build locally with stable signing when available"
 	@echo "    LOCAL_CODESIGN_IDENTITY=<SHA or name> overrides automatic Apple Development detection"
+	@echo "  local-cloud        Developer build with CLOUD_PROVIDERS defined (cloud providers compiled in)"
 	@echo "  run                Launch the built VoiceInk app"
 	@echo "  dev                Build and run the app (for development)"
 	@echo "  release            Build DMG and Appcast using release-notes/<version>.html"
