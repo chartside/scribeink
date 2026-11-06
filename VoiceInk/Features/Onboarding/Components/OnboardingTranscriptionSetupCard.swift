@@ -411,7 +411,7 @@ struct OnboardingTranscriptionSetupCard: View {
                     guard APIKeyManager.shared.saveAPIKey(key, forProvider: providerKey) else {
                         verificationSucceeded = false
                         verificationMessage = String(
-                            localized: "The key worked, but VoiceInk could not save it securely.")
+                            localized: "The key worked, but ScribeInk could not save it securely.")
                         verificationDetailMessage = nil
                         onVerificationChanged()
                         return

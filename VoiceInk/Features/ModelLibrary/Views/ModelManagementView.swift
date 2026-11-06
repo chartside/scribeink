@@ -311,7 +311,7 @@ struct ModelManagementView: View {
             .buttonStyle(.plain)
 
             InfoTip(
-                "Add a custom fine-tuned whisper model to use with VoiceInk. Select the downloaded .bin file.",
+                "Add a custom fine-tuned whisper model to use with ScribeInk. Select the downloaded .bin file.",
                 learnMoreURL: "https://tryvoiceink.com/docs/custom-local-whisper-models"
             )
             .help("Read more about custom local models")

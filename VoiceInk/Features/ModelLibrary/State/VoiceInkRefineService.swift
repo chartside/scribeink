@@ -15,9 +15,9 @@ enum VoiceInkRefineError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .unavailable:
-            return String(localized: "VoiceInk Refine requires an Apple silicon Mac with at least 16 GB of memory.")
+            return String(localized: "ScribeInk Refine requires an Apple silicon Mac with at least 16 GB of memory.")
         case .modelNotDownloaded:
-            return String(localized: "VoiceInk Refine is not downloaded.")
+            return String(localized: "ScribeInk Refine is not downloaded.")
         }
     }
 }

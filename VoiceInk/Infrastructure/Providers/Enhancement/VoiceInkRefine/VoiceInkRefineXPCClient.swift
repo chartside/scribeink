@@ -431,20 +431,20 @@ actor VoiceInkRefineXPCClient {
         let description: String
         switch code {
         case .invalidRequest:
-            description = String(localized: "VoiceInk Refine received an invalid request.")
+            description = String(localized: "ScribeInk Refine received an invalid request.")
         case .inferenceFailed:
             switch operation {
             case .prepare:
-                description = String(localized: "VoiceInk Refine could not prepare the model.")
+                description = String(localized: "ScribeInk Refine could not prepare the model.")
             case .enhance:
                 description = String(
-                    localized: "VoiceInk Refine could not complete the enhancement."
+                    localized: "ScribeInk Refine could not complete the enhancement."
                 )
             }
         case .invalidResponse:
-            description = String(localized: "VoiceInk Refine returned an invalid response.")
+            description = String(localized: "ScribeInk Refine returned an invalid response.")
         case .connectionFailed:
-            description = String(localized: "Could not communicate with VoiceInk Refine.")
+            description = String(localized: "Could not communicate with ScribeInk Refine.")
         }
 
         return makeVoiceInkRefineXPCError(code, description: description)
