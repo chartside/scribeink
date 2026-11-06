@@ -15,17 +15,29 @@ struct OnboardingAPIScreen: View {
     let onRequestSkip: () -> Void
     let onConfirmSkip: () -> Void
 
+    /// On-device builds have no cloud provider to verify, so the step needs no key.
+    private var isContinueEnabled: Bool {
+        canContinue && (isSelectedProviderVerified || !ProviderPolicy.allowsCloud)
+    }
+
     var body: some View {
         OnboardingStepScreen(
             stage: .api,
             contentMaxWidth: contentMaxWidth
         ) {
-            AIProviderVerificationCard(
-                aiService: aiService,
-                providerOptions: providerOptions,
-                selectedProvider: $selectedProvider,
-                onVerificationChanged: onVerificationChanged
-            )
+            if ProviderPolicy.allowsCloud {
+                AIProviderVerificationCard(
+                    aiService: aiService,
+                    providerOptions: providerOptions,
+                    selectedProvider: $selectedProvider,
+                    onVerificationChanged: onVerificationChanged
+                )
+            } else {
+                Text("AI enhancement runs on this device. No cloud provider setup is needed.")
+                    .font(.system(size: 14))
+                    .foregroundColor(AppTheme.Text.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
         } bottomBar: {
             HStack(spacing: 0) {
                 Button(action: onBack) {
@@ -39,7 +51,7 @@ struct OnboardingAPIScreen: View {
 
                 Spacer(minLength: 0)
 
-                if !isSelectedProviderVerified {
+                if ProviderPolicy.allowsCloud && !isSelectedProviderVerified {
                     Button(action: onRequestSkip) {
                         Text("Set It Up Later")
                             .font(.system(size: 10, weight: .medium))
@@ -60,7 +72,7 @@ struct OnboardingAPIScreen: View {
                     Text("Continue")
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundColor(
-                            canContinue && isSelectedProviderVerified
+                            isContinueEnabled
                                 ? AppTheme.Action.primaryForeground : AppTheme.Action.disabledForeground
                         )
                         .padding(.horizontal, 20)
@@ -68,13 +80,13 @@ struct OnboardingAPIScreen: View {
                         .background(
                             RoundedRectangle(cornerRadius: AppTheme.Radius.control, style: .continuous)
                                 .fill(
-                                    canContinue && isSelectedProviderVerified
+                                    isContinueEnabled
                                         ? AppTheme.Action.primaryFill : AppTheme.Action.disabledFill
                                 )
                         )
                 }
                 .buttonStyle(.plain)
-                .disabled(!(canContinue && isSelectedProviderVerified))
+                .disabled(!isContinueEnabled)
             }
             .frame(maxWidth: OnboardingLayout.chromeMaxWidth)
         }

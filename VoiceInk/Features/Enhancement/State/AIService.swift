@@ -258,7 +258,7 @@ class AIService: ObservableObject {
     @Published private(set) var isOllamaRefreshing = false
 
     var connectedProviders: [AIProvider] {
-        AIProvider.allCases.filter { provider in
+        AIProvider.allCases.filter { ProviderPolicy.isAllowed($0) }.filter { provider in
             guard provider.supportsEnhancement else {
                 return false
             }

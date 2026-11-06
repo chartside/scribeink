@@ -44,7 +44,9 @@ struct OnboardingTranscriptionSetupCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            setupSwitcher
+            if ProviderPolicy.allowsCloud {
+                setupSwitcher
+            }
 
             switch setupKind {
             case .local:

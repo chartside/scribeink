@@ -20,7 +20,7 @@ struct APIKeyManagementView: View {
     @State private var isSyncingLocalCLIState = false
 
     private var providerOptions: [AIProvider] {
-        AIProvider.allCases.filter { provider in
+        AIProvider.allCases.filter { ProviderPolicy.isAllowed($0) }.filter { provider in
             guard provider.supportsEnhancement else { return false }
             guard provider != .voiceInkRefine else { return false }
             if provider == .custom {

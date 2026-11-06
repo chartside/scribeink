@@ -243,7 +243,7 @@ final class OnboardingCoordinator: ObservableObject {
             .mistral,
         ]
 
-        let supportedProviders = AIProvider.allCases.filter { provider in
+        let supportedProviders = AIProvider.allCases.filter { ProviderPolicy.isAllowed($0) }.filter { provider in
             provider.supportsEnhancement && provider.requiresAPIKey && provider != .custom
         }
 
@@ -260,7 +260,8 @@ final class OnboardingCoordinator: ObservableObject {
     }
 
     var transcriptionSetupKind: OnboardingTranscriptionSetupKind {
-        OnboardingTranscriptionSetupKind(rawValue: storedTranscriptionSetupKind) ?? .local
+        guard ProviderPolicy.allowsCloud else { return .local }
+        return OnboardingTranscriptionSetupKind(rawValue: storedTranscriptionSetupKind) ?? .local
     }
 
     var onboardingTranscriptionProviderOptions: [any CloudProvider] {
@@ -269,7 +270,7 @@ final class OnboardingCoordinator: ObservableObject {
             "Speechmatics", "xAI", "Mistral", "Groq", "Gemini",
         ]
 
-        return CloudProviderRegistry.allProviders.sorted { first, second in
+        return CloudProviderRegistry.allProviders.filter { ProviderPolicy.isAllowed($0.modelProvider) }.sorted { first, second in
             let firstIndex = preferredOrder.firstIndex(of: first.providerKey) ?? Int.max
             let secondIndex = preferredOrder.firstIndex(of: second.providerKey) ?? Int.max
             if firstIndex != secondIndex { return firstIndex < secondIndex }
@@ -318,7 +319,7 @@ final class OnboardingCoordinator: ObservableObject {
     }
 
     var activeExperienceSteps: [OnboardingExperienceStep] {
-        if hasSkippedAPISetup && !isSelectedAPIProviderVerified {
+        if !ProviderPolicy.allowsCloud || (hasSkippedAPISetup && !isSelectedAPIProviderVerified) {
             return OnboardingExperienceCatalog.steps.filter { !$0.requiresVerifiedAPIProvider }
         }
 
@@ -415,7 +416,7 @@ final class OnboardingCoordinator: ObservableObject {
 
     func isReadyForExperience(isTranscriptionSetupReady: Bool) -> Bool {
         requiredPermissionsGranted && hasSelectedOnboardingMicrophone && isTranscriptionSetupReady
-            && (isSelectedAPIProviderVerified || hasSkippedAPISetup)
+            && (isSelectedAPIProviderVerified || hasSkippedAPISetup || !ProviderPolicy.allowsCloud)
     }
 
     func isCurrentExperienceReady(isTranscriptionSetupReady: Bool) -> Bool {

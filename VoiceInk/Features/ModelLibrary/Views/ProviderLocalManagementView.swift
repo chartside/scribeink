@@ -21,7 +21,9 @@ struct LocalEnhancementServiceManagementView: View {
         VStack(alignment: .leading, spacing: 10) {
             ProviderSectionHeader(
                 title: "Local Enhancement Services",
-                subtitle: "Connect Ollama or configure a CLI command for local enhancement."
+                subtitle: ProviderPolicy.isAllowed(.localCLI)
+                    ? "Connect Ollama or configure a CLI command for local enhancement."
+                    : "Connect Ollama for local enhancement."
             )
             .padding(.top, 8)
 
@@ -36,17 +38,19 @@ struct LocalEnhancementServiceManagementView: View {
                     ollamaConfiguration
                 }
 
-                Divider()
-                    .padding(.leading, 58)
+                if ProviderPolicy.isAllowed(.localCLI) {
+                    Divider()
+                        .padding(.leading, 58)
 
-                LocalProviderDisclosureRow(
-                    title: Text("CLI Provider"),
-                    subtitle: Text("Claude, Codex, scripts, or any command"),
-                    systemImage: "terminal",
-                    statusTitle: isLocalCLIConfigured ? Text("Configured") : Text("Not configured"),
-                    isExpanded: $isLocalCLIExpanded
-                ) {
-                    localCLIConfiguration
+                    LocalProviderDisclosureRow(
+                        title: Text("CLI Provider"),
+                        subtitle: Text("Claude, Codex, scripts, or any command"),
+                        systemImage: "terminal",
+                        statusTitle: isLocalCLIConfigured ? Text("Configured") : Text("Not configured"),
+                        isExpanded: $isLocalCLIExpanded
+                    ) {
+                        localCLIConfiguration
+                    }
                 }
             }
             .background(AppMaterialCardBackground(cornerRadius: 11))
