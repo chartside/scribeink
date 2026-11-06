@@ -1,0 +1,14 @@
+# Allow-list for scripts/check-scribeink-identity.sh
+# Format: <path-glob><TAB><literal substring>
+#   A FAIL is suppressed when the file matches the glob AND the offending line
+#   (or, for xcstrings, the offending string) contains the literal.
+#   A bare <path-glob> with no literal exempts the whole file.
+# Globs use shell `case` matching, so `*` also crosses `/`.
+
+# Whole-file exemptions
+LICENSE
+docs/*
+
+# Attribution sentence (About screen), and upstream links
+*	ScribeInk is based on VoiceInk by Prakash Joshi Pax, licensed under GPL v3
+*	github.com/Beingpax
