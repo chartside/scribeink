@@ -33,9 +33,16 @@ class OllamaService: ObservableObject {
         URL(string: baseURL)
     }
 
+    /// Every probe (connection check, model list) passes through here, so no caller can contact
+    /// an unconfirmed remote host in an on-device build. Cloud builds always pass.
+    private var probeURL: URL? {
+        guard let url = baseURLValue, LocalEndpoint.isPermitted(url) else { return nil }
+        return url
+    }
+
     @MainActor
     func checkConnection() async {
-        guard let url = baseURLValue else {
+        guard let url = probeURL else {
             isConnected = false
             return
         }
@@ -56,6 +63,11 @@ class OllamaService: ObservableObject {
             isConnected = false
             availableModels = []
             return .failure(LocalAIError.invalidURL)
+        }
+        guard probeURL != nil else {
+            isConnected = false
+            availableModels = []
+            return .failure(ProviderPolicyError.remoteEndpointNotConfirmed(host: url.host ?? ""))
         }
 
         do {

@@ -708,6 +708,12 @@ class AIService: ObservableObject {
             return errorDescription
         }
 
+        if let policyError = error as? ProviderPolicyError,
+            let errorDescription = policyError.errorDescription
+        {
+            return errorDescription
+        }
+
         let nsError = error as NSError
         var details = [nsError.localizedDescription]
 
