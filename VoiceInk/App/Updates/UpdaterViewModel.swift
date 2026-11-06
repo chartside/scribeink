@@ -24,8 +24,17 @@ final class UpdaterViewModel: NSObject, ObservableObject, SPUUpdaterDelegate {
     @Published private(set) var canCheckForUpdates = false
     @Published private(set) var automaticallyChecksForUpdates = false
 
+    /// False while ScribeInk has no update feed of its own. When false the Sparkle
+    /// controller is never created, so nothing contacts an update server.
+    let isAvailable = UpstreamServices.updatesEnabled
+
     override init() {
         super.init()
+
+        guard isAvailable else {
+            logger.notice("Updates unavailable; Sparkle not started")
+            return
+        }
 
         let updater = updaterController.updater
 
@@ -56,12 +65,12 @@ final class UpdaterViewModel: NSObject, ObservableObject, SPUUpdaterDelegate {
     }
 
     func setAutomaticallyChecksForUpdates(_ value: Bool) {
-        guard automaticallyChecksForUpdates != value else { return }
+        guard isAvailable, automaticallyChecksForUpdates != value else { return }
         updaterController.updater.automaticallyChecksForUpdates = value
     }
 
     func checkForUpdates() {
-        guard canCheckForUpdates else { return }
+        guard isAvailable, canCheckForUpdates else { return }
 
         // This action also brings an existing update/progress window into focus.
         // Manual checks remain available when automatic checks are off.
@@ -126,7 +135,9 @@ struct CheckForUpdatesView: View {
     @ObservedObject var updaterViewModel: UpdaterViewModel
 
     var body: some View {
-        Button("Check for Updates…", action: updaterViewModel.checkForUpdates)
-            .disabled(!updaterViewModel.canCheckForUpdates)
+        if updaterViewModel.isAvailable {
+            Button("Check for Updates…", action: updaterViewModel.checkForUpdates)
+                .disabled(!updaterViewModel.canCheckForUpdates)
+        }
     }
 }

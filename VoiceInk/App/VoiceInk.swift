@@ -310,12 +310,14 @@ struct VoiceInkApp: App {
                         .environmentObject(enhancementService)
                         .modelContainer(container)
                         .onAppear {
-                            if enableAnnouncements {
+                            if UpstreamServices.announcementsEnabled && enableAnnouncements {
                                 AnnouncementsService.shared.start()
                             }
                             showLaunchRemindersIfNeeded()
 
-                            GitHubStarPromptCoordinator.shared.scheduleIfNeeded(modelContainer: container)
+                            if UpstreamServices.starPromptEnabled {
+                                GitHubStarPromptCoordinator.shared.scheduleIfNeeded(modelContainer: container)
+                            }
 
                             // Run due audio-only cleanup and schedule future checks when transcript cleanup is not managing retention.
                             if !UserDefaults.standard.bool(forKey: CleanupSettingsKeys.isTranscriptionCleanupEnabled)
@@ -372,7 +374,9 @@ struct VoiceInkApp: App {
                     for: [.applicationDidBecomeActive, .systemDidWake]
                 )
             ) { _ in
-                licenseViewModel.refreshLicenseState()
+                if UpstreamServices.licensingEnabled {
+                    licenseViewModel.refreshLicenseState()
+                }
             }
         }
         .windowStyle(.hiddenTitleBar)

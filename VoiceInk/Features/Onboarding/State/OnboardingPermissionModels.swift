@@ -1,6 +1,15 @@
 import SwiftUI
 
 enum OnboardingStage: String, CaseIterable {
+    /// The licence step runs only with upstream licensing on, and never in local builds.
+    static var includesLicenseStep: Bool {
+        #if LOCAL_BUILD
+            return false
+        #else
+            return UpstreamServices.licensingEnabled
+        #endif
+    }
+
     case permissions
     case microphone
     case model

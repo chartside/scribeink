@@ -32,6 +32,8 @@ final class MainWindowNavigation: ObservableObject {
     }
 
     func navigate(to destination: ViewType) {
+        // The licence page has no entry point while upstream licensing is off.
+        guard destination != .license || UpstreamServices.licensingEnabled else { return }
         selectedView = destination
     }
 
@@ -108,7 +110,11 @@ struct ContentView: View {
         case .settings:
             SettingsView()
         case .license:
-            LicenseManagementView()
+            if UpstreamServices.licensingEnabled {
+                LicenseManagementView()
+            } else {
+                DashboardView()
+            }
         }
     }
 }

@@ -94,11 +94,9 @@ final class OnboardingCoordinator: ObservableObject {
     }
 
     var stage: OnboardingStage {
-        #if LOCAL_BUILD
-            if storedStage == OnboardingStage.license.rawValue {
-                return .trust
-            }
-        #endif
+        if !OnboardingStage.includesLicenseStep, storedStage == OnboardingStage.license.rawValue {
+            return .trust
+        }
 
         if let stage = OnboardingStage(rawValue: storedStage) {
             return stage
@@ -144,11 +142,9 @@ final class OnboardingCoordinator: ObservableObject {
     }
 
     var totalStepCount: Int {
-        #if LOCAL_BUILD
-            OnboardingStage.baseStepCount + activeExperienceSteps.count + contextAwarenessStepCount + 1
-        #else
-            OnboardingStage.baseStepCount + activeExperienceSteps.count + contextAwarenessStepCount + 2
-        #endif
+        let finalStepCount = OnboardingStage.includesLicenseStep ? 2 : 1
+        return OnboardingStage.baseStepCount + activeExperienceSteps.count + contextAwarenessStepCount
+            + finalStepCount
     }
 
     var experienceStep: OnboardingExperienceStep {

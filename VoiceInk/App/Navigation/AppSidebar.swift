@@ -23,7 +23,7 @@ struct AppSidebar: View {
 
             Spacer(minLength: 16)
 
-            sidebarSection(ViewType.secondaryItems)
+            sidebarSection(ViewType.secondaryItems.filter(\.isShownInSidebar))
                 .padding(.bottom, 14)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -82,6 +82,11 @@ private extension ViewType {
         .settings,
         .license,
     ]
+
+    /// The licence page is hidden while upstream licensing is off.
+    var isShownInSidebar: Bool {
+        self != .license || UpstreamServices.licensingEnabled
+    }
 
     static func assertSidebarItemsCoverAllCases() {
         #if DEBUG

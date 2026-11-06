@@ -249,28 +249,39 @@ struct SettingsView: View {
                 )
                 .disabled(launchAtLoginManager.isUpdating)
 
-                Toggle(
-                    "Automatically Check for Updates",
-                    isOn: Binding(
-                        get: { updaterViewModel.automaticallyChecksForUpdates },
-                        set: { updaterViewModel.setAutomaticallyChecksForUpdates($0) }
-                    ))
-                    .help("Checks for updates in the background while ScribeInk is running.")
+                if updaterViewModel.isAvailable {
+                    Toggle(
+                        "Automatically Check for Updates",
+                        isOn: Binding(
+                            get: { updaterViewModel.automaticallyChecksForUpdates },
+                            set: { updaterViewModel.setAutomaticallyChecksForUpdates($0) }
+                        ))
+                        .help("Checks for updates in the background while ScribeInk is running.")
+                }
 
-                Toggle("Show Announcements", isOn: $enableAnnouncements)
-                    .onChange(of: enableAnnouncements) { _, newValue in
-                        if newValue {
-                            AnnouncementsService.shared.start()
-                        } else {
-                            AnnouncementsService.shared.stop()
+                if UpstreamServices.announcementsEnabled {
+                    Toggle("Show Announcements", isOn: $enableAnnouncements)
+                        .onChange(of: enableAnnouncements) { _, newValue in
+                            if newValue {
+                                AnnouncementsService.shared.start()
+                            } else {
+                                AnnouncementsService.shared.stop()
+                            }
                         }
-                    }
+                }
+
+                if !updaterViewModel.isAvailable {
+                    Text("Updates are not available yet.")
+                        .foregroundStyle(.secondary)
+                }
 
                 HStack {
-                    Button("Check for Updates") {
-                        updaterViewModel.checkForUpdates()
+                    if updaterViewModel.isAvailable {
+                        Button("Check for Updates") {
+                            updaterViewModel.checkForUpdates()
+                        }
+                        .disabled(!updaterViewModel.canCheckForUpdates)
                     }
-                    .disabled(!updaterViewModel.canCheckForUpdates)
 
                     Button("Reset Onboarding") {
                         showResetOnboardingAlert = true

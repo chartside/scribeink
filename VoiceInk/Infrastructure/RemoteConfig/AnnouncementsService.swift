@@ -22,6 +22,10 @@ final class AnnouncementsService {
     // MARK: - Public API
 
     func start() {
+        guard UpstreamServices.announcementsEnabled else {
+            stop()
+            return
+        }
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: refreshInterval, repeats: true) { [weak self] _ in
             self?.fetchAndMaybeShow()
@@ -40,6 +44,7 @@ final class AnnouncementsService {
     // MARK: - Core Logic
 
     private func fetchAndMaybeShow() {
+        guard UpstreamServices.announcementsEnabled else { return }
         let request = URLRequest(url: announcementsURL, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
         let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             guard let self = self else { return }

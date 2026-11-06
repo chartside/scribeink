@@ -31,7 +31,9 @@ final class GitHubStarPromptCoordinator: ObservableObject {
     @Published private(set) var openFailed = false
 
     // Shown in the Dashboard footer only once Later has been clicked - never appears from a toast-only flow.
-    var showsFooterStarButton: Bool { hasDeferredAtLeastOnce && (!isResolved || completionState != .none) }
+    var showsFooterStarButton: Bool {
+        UpstreamServices.starPromptEnabled && hasDeferredAtLeastOnce && (!isResolved || completionState != .none)
+    }
 
     private static let repoURL = URL(string: "https://github.com/Beingpax/VoiceInk")!
     private static let showDelaySeconds: TimeInterval = 3
@@ -55,7 +57,7 @@ final class GitHubStarPromptCoordinator: ObservableObject {
 
     // Call once when the main window appears; only the first call per app run schedules the timer.
     func scheduleIfNeeded(modelContainer: ModelContainer) {
-        guard !hasScheduled else { return }
+        guard UpstreamServices.starPromptEnabled, !hasScheduled else { return }
         hasScheduled = true
         self.modelContainer = modelContainer
         guard Self.shouldShow else { return }
@@ -89,7 +91,7 @@ final class GitHubStarPromptCoordinator: ObservableObject {
     }
 
     func star() {
-        guard !isStarring, completionState == .none else { return }
+        guard UpstreamServices.starPromptEnabled, !isStarring, completionState == .none else { return }
 
         if mode == .web {
             // Only mark resolved if the browser actually opened - keeps the retry path alive otherwise.
@@ -148,6 +150,7 @@ final class GitHubStarPromptCoordinator: ObservableObject {
 
     // Once Later has been clicked, the toast retires for good; the persistent footer button takes over.
     private static var shouldShow: Bool {
+        guard UpstreamServices.starPromptEnabled else { return false }
         let defaults = UserDefaults.standard
         if defaults.bool(forKey: Keys.hasStarred) { return false }
         if defaults.bool(forKey: Keys.hasDeferredOnce) { return false }

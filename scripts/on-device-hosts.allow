@@ -68,6 +68,7 @@ VoiceInk/Features/Onboarding/Components/AIProviderVerificationCard.swift openrou
 VoiceInk/Features/Onboarding/Components/AIProviderVerificationCard.swift platform.openai.com
 VoiceInk/Features/Settings/Support/EmailSupport.swift tryvoiceink.com
 VoiceInk/Infrastructure/Licensing/PolarService.swift api.polar.sh
+VoiceInk/Infrastructure/Privacy/UpstreamServices.swift github.com
 VoiceInk/Infrastructure/Providers/Enhancement/Chat/AIChatCompletionService.swift tryvoiceink.com
 VoiceInk/Infrastructure/Providers/Enhancement/VoiceInkRefine/VoiceInkRefineModelDownloader.swift huggingface.co
 VoiceInk/Infrastructure/Providers/Transcription/Cloud/GroqProvider.swift api.groq.com

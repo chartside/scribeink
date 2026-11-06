@@ -56,7 +56,8 @@ final class OnboardingFlowController {
     }
 
     func goToLicenseStep(isTranscriptionSetupReady: Bool) {
-        guard coordinator.isReadyForExperience(isTranscriptionSetupReady: isTranscriptionSetupReady) else { return }
+        guard OnboardingStage.includesLicenseStep,
+            coordinator.isReadyForExperience(isTranscriptionSetupReady: isTranscriptionSetupReady) else { return }
         coordinator.storedStage = OnboardingStage.license.rawValue
     }
 
@@ -342,11 +343,9 @@ final class OnboardingFlowController {
         isTranscriptionSetupReady: Bool,
         onComplete: () -> Void
     ) {
-        #if LOCAL_BUILD
-            let isFinalStage = coordinator.stage == .license || coordinator.stage == .trust
-        #else
-            let isFinalStage = coordinator.stage == .license
-        #endif
+        let isFinalStage =
+            coordinator.stage == .license
+            || (!OnboardingStage.includesLicenseStep && coordinator.stage == .trust)
 
         guard
             isFinalStage || coordinator.isCurrentExperienceReady(isTranscriptionSetupReady: isTranscriptionSetupReady)

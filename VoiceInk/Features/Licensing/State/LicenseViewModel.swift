@@ -73,6 +73,13 @@ final class LicenseViewModel: ObservableObject {
         self.automaticallyRetriesStorage = automaticallyRetriesStorage
         self.automaticallyRefreshesTime = automaticallyRefreshesTime
 
+        guard UpstreamServices.licensingEnabled else {
+            // Upstream licensing is off: fully licensed, no Keychain read, no Polar call.
+            isPersistentStateAvailable = true
+            licenseState = .licensed
+            return
+        }
+
         #if LOCAL_BUILD
             isPersistentStateAvailable = true
             licenseState = .licensed
@@ -88,6 +95,7 @@ final class LicenseViewModel: ObservableObject {
 
     @discardableResult
     func startTrial() -> Bool {
+        guard UpstreamServices.licensingEnabled else { return true }
         clearValidationMessage()
 
         if trialStartDate != nil {
@@ -123,6 +131,7 @@ final class LicenseViewModel: ObservableObject {
     }
 
     func refreshLicenseState() {
+        guard UpstreamServices.licensingEnabled else { return }
         if !isPersistentStateAvailable {
             retryPersistentStateLoad()
         } else {
@@ -131,12 +140,12 @@ final class LicenseViewModel: ObservableObject {
     }
 
     func retryPersistentStateLoad() {
-        guard !isPersistentStateAvailable else { return }
+        guard UpstreamServices.licensingEnabled, !isPersistentStateAvailable else { return }
         loadPersistentState()
     }
 
     func refreshTimeDependentState() {
-        guard isPersistentStateAvailable else { return }
+        guard UpstreamServices.licensingEnabled, isPersistentStateAvailable else { return }
         licenseState = resolvedState(at: now())
         scheduleStateRefreshIfNeeded()
     }
@@ -146,10 +155,11 @@ final class LicenseViewModel: ObservableObject {
     }
 
     var hasVerifiedLicense: Bool {
+        guard UpstreamServices.licensingEnabled else { return true }
         #if LOCAL_BUILD
-            true
+            return true
         #else
-            isPersistentStateAvailable && storedLicenseKey != nil && licenseState == .licensed
+            return isPersistentStateAvailable && storedLicenseKey != nil && licenseState == .licensed
         #endif
     }
 
@@ -175,6 +185,7 @@ final class LicenseViewModel: ObservableObject {
     }
 
     var diagnosticLicenseStatus: String {
+        guard UpstreamServices.licensingEnabled else { return "Licensing Off (Fully Licensed)" }
         if userDefaults.bool(forKey: pendingRemovalKey) {
             return "License Removed (Local Cleanup Pending)"
         }
@@ -195,13 +206,14 @@ final class LicenseViewModel: ObservableObject {
     }
 
     func openPurchaseLink() {
+        guard UpstreamServices.licensingEnabled else { return }
         if let url = URL(string: "https://tryvoiceink.com/buy") {
             NSWorkspace.shared.open(url)
         }
     }
 
     func validateLicense(_ submittedKey: String) async {
-        guard !isValidating else { return }
+        guard UpstreamServices.licensingEnabled, !isValidating else { return }
 
         if !isPersistentStateAvailable {
             retryPersistentStateLoad()
@@ -352,7 +364,7 @@ final class LicenseViewModel: ObservableObject {
     }
 
     func deactivateLicense() async {
-        guard !isDeactivating else { return }
+        guard UpstreamServices.licensingEnabled, !isDeactivating else { return }
 
         if !isPersistentStateAvailable {
             retryPersistentStateLoad()
@@ -459,6 +471,8 @@ final class LicenseViewModel: ObservableObject {
     }
 
     private func resolvedState(at date: Date) -> LicenseState {
+        guard UpstreamServices.licensingEnabled else { return .licensed }
+
         #if LOCAL_BUILD
             return .licensed
         #endif

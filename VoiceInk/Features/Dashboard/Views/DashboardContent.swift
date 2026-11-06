@@ -495,6 +495,13 @@ struct DashboardContent: View {
 
     @ViewBuilder
     private var licenseStatusMessage: some View {
+        if UpstreamServices.licensingEnabled {
+            trialStatusMessage
+        }
+    }
+
+    @ViewBuilder
+    private var trialStatusMessage: some View {
         switch licenseState {
         case .unlicensed:
             TrialMessageView(
@@ -567,7 +574,7 @@ struct DashboardContent: View {
 
     private var footerActionsView: some View {
         HStack(alignment: .center, spacing: 12) {
-            if starPrompt.showsFooterStarButton {
+            if UpstreamServices.starPromptEnabled && starPrompt.showsFooterStarButton {
                 Button(action: { starPrompt.star() }) {
                     footerStarButtonLabel
                 }
