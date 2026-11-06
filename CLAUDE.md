@@ -50,9 +50,17 @@ still to build.
   Implemented: cloud transcription gated behind `CLOUD_PROVIDERS`; cloud enhancement
   refused by `ProviderPolicy` and hidden; pending verification on a Mac
   (`docs/qa/on-device-checklist.md`).
-- Medical vocabulary and a custom dictionary (drug names, anatomy, abbreviations).
-- Template-driven note generation from the transcript, using a local LLM.
-- Rename from VoiceInk to ScribeInk in the UI, bundle ID and app name (keep upstream attribution).
+Priority order set by the operator on 2026-11-06:
+
+1. Rename to ScribeInk as a parallel install next to VoiceInk, and apply `DESIGN.md`
+   (spec: `docs/superpowers/specs/2026-11-06-scribeink-identity-and-design.md`). Internal
+   Xcode target, file and Swift type names stay `VoiceInk*` to keep upstream merges
+   workable; only user-visible names change.
+2. Medical vocabulary and a custom dictionary (drug names, anatomy, abbreviations).
+3. Template-driven note generation from the transcript, using a local LLM.
+4. ScribeInk's own updates, licensing and announcements (replacing the upstream services
+   switched off in item 1).
+5. `scribeink-ios` on-device work.
 
 ## Design
 
