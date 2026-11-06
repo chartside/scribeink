@@ -1,3 +1,4 @@
+#if CLOUD_PROVIDERS
 import Foundation
 import LLMkit
 
@@ -101,3 +102,4 @@ final class SpeechmaticsStreamingProvider: StreamingTranscriptionProvider {
         }
     }
 }
+#endif

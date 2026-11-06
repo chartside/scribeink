@@ -4,7 +4,9 @@ enum TranscriptionModelRegistry {
 
     static var models: [any TranscriptionModel] {
         let cloudModels: [any TranscriptionModel] = CloudProviderRegistry.allProviders.flatMap { $0.models }
-        return predefinedModels + cloudModels + CustomCloudModelManager.shared.customModels
+        let allModels: [any TranscriptionModel] =
+            predefinedModels + cloudModels + CustomCloudModelManager.shared.customModels
+        return allModels.filter { ProviderPolicy.isAllowed($0.provider) }
     }
 
     static func model(forSelectionKey key: String, in models: [any TranscriptionModel]) -> (any TranscriptionModel)? {

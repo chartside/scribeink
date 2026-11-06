@@ -1,3 +1,4 @@
+#if CLOUD_PROVIDERS
 import Foundation
 import LLMkit
 
@@ -30,3 +31,4 @@ struct CartesiaProvider: CloudProvider {
         return await CartesiaStreamingClient.verifyAPIKey(key)
     }
 }
+#endif

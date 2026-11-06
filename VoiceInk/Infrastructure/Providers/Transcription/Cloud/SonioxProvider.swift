@@ -1,3 +1,4 @@
+#if CLOUD_PROVIDERS
 import Foundation
 import LLMkit
 
@@ -52,3 +53,4 @@ struct SonioxProvider: CloudProvider {
         return await SonioxClient.verifyAPIKey(key)
     }
 }
+#endif

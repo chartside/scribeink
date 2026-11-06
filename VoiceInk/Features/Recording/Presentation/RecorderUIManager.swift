@@ -248,6 +248,19 @@ class RecorderUIManager: ObservableObject, RecorderPanelPresenting {
                 await dismissRecorderPanel()
             }
         } else {
+            // Only an explicitly chosen mode is final here. For app-rule and default modes a
+            // website rule may still select another mode, so the engine checks the resolved
+            // mode after recording starts instead.
+            if let explicitMode = OnDeviceReadiness.explicitModeForRecordingStart(modeId: modeId),
+                let blockedRoute = OnDeviceReadiness.blockedTranscriptionRoute(
+                    mode: explicitMode,
+                    transcriptionModelManager: engine.transcriptionModelManager
+                )
+            {
+                ShortcutDiagnostics.notice("recorder-toggle result=blocked reason=provider-not-allowed")
+                OnDeviceReadiness.presentBlockedTranscription(route: blockedRoute)
+                return
+            }
             SoundManager.shared.playStartSound()
             isRecorderPanelVisible = true
             await engine.toggleRecord(modeId: modeId)

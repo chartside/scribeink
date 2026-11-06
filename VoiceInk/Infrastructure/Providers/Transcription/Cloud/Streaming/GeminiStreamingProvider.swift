@@ -1,3 +1,4 @@
+#if CLOUD_PROVIDERS
 import Foundation
 import LLMkit
 
@@ -103,3 +104,4 @@ final class GeminiStreamingProvider: StreamingTranscriptionProvider {
         }
     }
 }
+#endif

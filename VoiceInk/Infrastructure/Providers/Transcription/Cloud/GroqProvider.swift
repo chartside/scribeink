@@ -1,3 +1,4 @@
+#if CLOUD_PROVIDERS
 import Foundation
 import LLMkit
 
@@ -59,3 +60,4 @@ struct GroqProvider: CloudProvider {
         )
     }
 }
+#endif

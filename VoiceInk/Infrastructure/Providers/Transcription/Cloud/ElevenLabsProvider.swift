@@ -1,3 +1,4 @@
+#if CLOUD_PROVIDERS
 import Foundation
 import LLMkit
 
@@ -63,3 +64,4 @@ struct ElevenLabsProvider: CloudProvider {
         return await ElevenLabsClient.verifyAPIKey(key)
     }
 }
+#endif

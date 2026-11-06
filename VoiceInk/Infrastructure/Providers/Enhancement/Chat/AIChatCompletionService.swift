@@ -16,6 +16,7 @@ extension AIService {
         timeout: TimeInterval = 30,
         retryOnTimeout: Bool = false
     ) async throws -> AIChatCompletionResult {
+        try ProviderPolicy.requireAllowed(provider)
         let resolvedModel = modelName?.isEmpty == false ? modelName! : selectedModel(for: provider)
 
         let result: String
@@ -72,6 +73,7 @@ extension AIService {
             else {
                 throw EnhancementError.notConfigured
             }
+            try LocalEndpoint.requirePermitted(baseURL)
             result = try await OpenAILLMClient.chatCompletion(
                 baseURL: baseURL,
                 apiKey: customConfiguration.apiKey,

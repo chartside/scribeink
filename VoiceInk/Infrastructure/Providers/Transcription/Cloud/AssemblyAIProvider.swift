@@ -1,3 +1,4 @@
+#if CLOUD_PROVIDERS
 import Foundation
 import LLMkit
 
@@ -107,3 +108,4 @@ struct AssemblyAIProvider: CloudProvider {
         static let universal2 = LanguageDictionary.forCodes(universal2Codes, includesAutoDetect: true)
     }
 }
+#endif

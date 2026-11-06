@@ -334,13 +334,22 @@ class VoiceInkEngine: NSObject, ObservableObject {
                                     from: modelResolution
                                 )
                             else {
-                                let failure = self.recordingModelFailure(for: modelResolution)
-                                NotificationManager.shared.showNotification(
-                                    title: failure.title,
-                                    type: .error,
-                                    duration: 7.0,
-                                    actionButton: (failure.actionLabel, failure.action)
-                                )
+                                // The panel checks before recording; this catches a mode picked
+                                // later (for example by a website rule).
+                                if let blockedRoute = OnDeviceReadiness.blockedTranscriptionRoute(
+                                    modelResolution,
+                                    knownModels: self.transcriptionModelManager.allAvailableModels
+                                ) {
+                                    OnDeviceReadiness.presentBlockedTranscription(route: blockedRoute)
+                                } else {
+                                    let failure = self.recordingModelFailure(for: modelResolution)
+                                    NotificationManager.shared.showNotification(
+                                        title: failure.title,
+                                        type: .error,
+                                        duration: 7.0,
+                                        actionButton: (failure.actionLabel, failure.action)
+                                    )
+                                }
                                 await self.recorder.stopRecording()
                                 try? FileManager.default.removeItem(at: permanentURL)
                                 self.recordedFile = nil

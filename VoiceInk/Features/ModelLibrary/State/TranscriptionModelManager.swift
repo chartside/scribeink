@@ -156,12 +156,14 @@ class TranscriptionModelManager: ObservableObject {
     }
 
     func refreshOpenRouterCatalog() async {
+        #if CLOUD_PROVIDERS
         do {
             try await OpenRouterTranscriptionCatalog.refresh()
             refreshAllAvailableModels()
         } catch {
             logger.error("Failed to refresh OpenRouter transcription models: \(error.localizedDescription, privacy: .public)")
         }
+        #endif
     }
 
     // MARK: - Clear current model

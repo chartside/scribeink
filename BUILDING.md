@@ -33,6 +33,16 @@ make local LOCAL_CODESIGN_IDENTITY=-
 
 Local builds do not include iCloud dictionary sync or automatic updates. Ad-hoc builds may require macOS permissions again after rebuilding.
 
+## Cloud-enabled developer build
+
+Default builds are on-device only. For development, `make local-cloud` builds with the `CLOUD_PROVIDERS` Swift flag (`CloudBuild.xcconfig`, which includes `LocalBuild.xcconfig`) and copies the app as `~/Downloads/ScribeInk Cloud Dev.app`. It accepts the same `LOCAL_CODESIGN_IDENTITY` override as `make local`.
+
+```bash
+make local-cloud
+```
+
+Never use this build with real patient data or distribute it. The flag is not defined in any Xcode configuration, so `make local`, `make build`, `make dev` and `make release` never enable it.
+
 ## Other Commands
 
 - `make check` — verify required tools

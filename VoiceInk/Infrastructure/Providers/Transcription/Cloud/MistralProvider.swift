@@ -1,3 +1,4 @@
+#if CLOUD_PROVIDERS
 import Foundation
 import LLMkit
 
@@ -83,3 +84,4 @@ struct MistralProvider: CloudProvider {
         static let realtime = LanguageDictionary.forCodes(realtimeCodes, includesAutoDetect: true)
     }
 }
+#endif

@@ -1,5 +1,25 @@
 import SwiftUI
 
+/// Pre-filled values for a new custom endpoint. On-device builds default to a local server
+/// (spec section 5); cloud builds keep upstream's values.
+enum CustomEndpointDefaults {
+    #if CLOUD_PROVIDERS
+    static let transcriptionEndpoint = "https://api.openai.com/v1/audio/transcriptions"
+    static let transcriptionModel = "gpt-4o-mini-transcribe"
+    static let transcriptionModelPlaceholder = "gpt-4o-mini-transcribe"
+    static let chatBaseURL = "https://api.openai.com/v1/chat/completions"
+    static let chatModel = "gpt-5.5"
+    static let chatModelPlaceholder = "gpt-5.5"
+    #else
+    static let transcriptionEndpoint = "http://localhost:8080/v1/audio/transcriptions"
+    static let transcriptionModel = ""
+    static let transcriptionModelPlaceholder = String(localized: "Model name")
+    static let chatBaseURL = "http://localhost:11434/v1/chat/completions"
+    static let chatModel = ""
+    static let chatModelPlaceholder = String(localized: "Model name")
+    #endif
+}
+
 struct CustomProviderManagementView: View {
     @ObservedObject var customModelManager: CustomCloudModelManager
     @ObservedObject var customAIProviderManager: CustomAIProviderManager
@@ -150,6 +170,8 @@ private struct CustomEnhancementModelRow: View {
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
+
+                RemoteEndpointBadge(urlString: provider.baseURL)
             }
 
             Spacer()
@@ -185,6 +207,8 @@ struct CustomTranscriptionModelEditorPanel: View {
     @State private var isSaving = false
     @State private var connectionTest: ConnectionTestState = .idle
     @State private var connectionTestTask: Task<Void, Never>?
+    @State private var pendingRemoteHost: String?
+    @State private var pendingRemoteAction: RemoteEndpointAction = .save
 
     private var isEditing: Bool {
         editingModel != nil
@@ -202,7 +226,18 @@ struct CustomTranscriptionModelEditorPanel: View {
         connectionTest = .idle
     }
 
+    /// Asks before probing a remote host the user hasn't accepted: the probe sends the API
+    /// key and a dummy upload to it.
     private func runConnectionTest() {
+        if let host = RemoteEndpointConfirmation.hostNeedingConfirmation(for: apiEndpoint) {
+            pendingRemoteAction = .testConnection
+            pendingRemoteHost = host
+            return
+        }
+        startConnectionTest()
+    }
+
+    private func startConnectionTest() {
         connectionTestTask?.cancel()
         connectionTest = .testing
         let endpoint = apiEndpoint.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -232,13 +267,14 @@ struct CustomTranscriptionModelEditorPanel: View {
                                 label: "Display Name", placeholder: String(localized: "My Custom Model"),
                                 text: $displayName)
                             CustomModelTextField(
-                                label: "API Endpoint", placeholder: "https://api.openai.com/v1/audio/transcriptions",
+                                label: "API Endpoint", placeholder: CustomEndpointDefaults.transcriptionEndpoint,
                                 text: $apiEndpoint)
                             CustomModelTextField(
                                 label: "API Key", placeholder: String(localized: "Paste API key"), text: $apiKey,
                                 isSecure: true)
                             CustomModelTextField(
-                                label: "Model Name", placeholder: "gpt-4o-mini-transcribe", text: $modelName)
+                                label: "Model Name", placeholder: CustomEndpointDefaults.transcriptionModelPlaceholder,
+                                text: $modelName)
                             CustomModelToggleRow(title: "Multilingual Model", isOn: $isMultilingual)
                             ConnectionTestRow(
                                 state: connectionTest, isDisabled: !canTestConnection, action: runConnectionTest)
@@ -274,6 +310,21 @@ struct CustomTranscriptionModelEditorPanel: View {
         .onChange(of: apiEndpoint) { _, _ in resetConnectionTest() }
         .onChange(of: apiKey) { _, _ in resetConnectionTest() }
         .onChange(of: modelName) { _, _ in resetConnectionTest() }
+        .remoteEndpointConfirmation(
+            urlString: $apiEndpoint,
+            pendingHost: $pendingRemoteHost,
+            // Cancelling a save restores the saved endpoint. A new model has none, so the
+            // typed value stays for the user to correct. Cancelling a test changes nothing.
+            revertTo: pendingRemoteAction == .save ? editingModel?.apiEndpoint : nil,
+            onConfirmed: {
+                switch pendingRemoteAction {
+                case .save:
+                    persistModel()
+                case .testConnection:
+                    startConnectionTest()
+                }
+            }
+        )
     }
 
     private var canSave: Bool {
@@ -292,9 +343,9 @@ struct CustomTranscriptionModelEditorPanel: View {
             isMultilingual = editingModel.isMultilingualModel
         } else {
             displayName = ""
-            apiEndpoint = "https://api.openai.com/v1/audio/transcriptions"
+            apiEndpoint = CustomEndpointDefaults.transcriptionEndpoint
             apiKey = ""
-            modelName = "gpt-4o-mini-transcribe"
+            modelName = CustomEndpointDefaults.transcriptionModel
             isMultilingual = true
         }
 
@@ -323,6 +374,24 @@ struct CustomTranscriptionModelEditorPanel: View {
         }
 
         guard validationErrors.isEmpty else { return }
+
+        if let host = RemoteEndpointConfirmation.hostNeedingConfirmation(for: trimmedEndpoint) {
+            pendingRemoteAction = .save
+            pendingRemoteHost = host
+            return
+        }
+        persistModel()
+    }
+
+    /// Writes the model. Runs directly from `saveModel` for a loopback or accepted host, or
+    /// after the user confirms the remote-endpoint warning.
+    private func persistModel() {
+        let trimmedDisplayName = displayName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedEndpoint = apiEndpoint.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedKey = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedModelName = modelName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let generatedName = trimmedDisplayName.lowercased().replacingOccurrences(of: " ", with: "-")
+
         isSaving = true
 
         if let editingModel {
@@ -392,6 +461,8 @@ struct CustomEnhancementModelEditorPanel: View {
     @State private var isSaving = false
     @State private var connectionTest: ConnectionTestState = .idle
     @State private var connectionTestTask: Task<Void, Never>?
+    @State private var pendingRemoteHost: String?
+    @State private var pendingRemoteAction: RemoteEndpointAction = .save
 
     private var isEditing: Bool {
         editingProvider != nil
@@ -409,7 +480,18 @@ struct CustomEnhancementModelEditorPanel: View {
         connectionTest = .idle
     }
 
+    /// Asks before probing a remote host the user hasn't accepted: the probe sends the API
+    /// key and a chat request to it.
     private func runConnectionTest() {
+        if let host = RemoteEndpointConfirmation.hostNeedingConfirmation(for: baseURL) {
+            pendingRemoteAction = .testConnection
+            pendingRemoteHost = host
+            return
+        }
+        startConnectionTest()
+    }
+
+    private func startConnectionTest() {
         connectionTestTask?.cancel()
         connectionTest = .testing
         let url = baseURL.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -439,12 +521,14 @@ struct CustomEnhancementModelEditorPanel: View {
                                 label: "Display Name", placeholder: String(localized: "My Enhancement Model"),
                                 text: $displayName)
                             CustomModelTextField(
-                                label: "Base URL", placeholder: "https://api.openai.com/v1/chat/completions",
+                                label: "Base URL", placeholder: CustomEndpointDefaults.chatBaseURL,
                                 text: $baseURL)
                             CustomModelTextField(
                                 label: "API Key", placeholder: String(localized: "Paste API key"), text: $apiKey,
                                 isSecure: true)
-                            CustomModelTextField(label: "Model Name", placeholder: "gpt-5.5", text: $modelName)
+                            CustomModelTextField(
+                                label: "Model Name", placeholder: CustomEndpointDefaults.chatModelPlaceholder,
+                                text: $modelName)
                             ConnectionTestRow(
                                 state: connectionTest, isDisabled: !canTestConnection, action: runConnectionTest)
                         }
@@ -481,6 +565,21 @@ struct CustomEnhancementModelEditorPanel: View {
         .onChange(of: baseURL) { _, _ in resetConnectionTest() }
         .onChange(of: apiKey) { _, _ in resetConnectionTest() }
         .onChange(of: modelName) { _, _ in resetConnectionTest() }
+        .remoteEndpointConfirmation(
+            urlString: $baseURL,
+            pendingHost: $pendingRemoteHost,
+            // Cancelling a save restores the saved URL. A new provider has none, so the
+            // typed value stays for the user to correct. Cancelling a test changes nothing.
+            revertTo: pendingRemoteAction == .save ? editingProvider?.baseURL : nil,
+            onConfirmed: {
+                switch pendingRemoteAction {
+                case .save:
+                    persistProvider()
+                case .testConnection:
+                    startConnectionTest()
+                }
+            }
+        )
     }
 
     private var canSave: Bool {
@@ -498,9 +597,9 @@ struct CustomEnhancementModelEditorPanel: View {
             modelName = editingProvider.modelName
         } else {
             displayName = ""
-            baseURL = "https://api.openai.com/v1/chat/completions"
+            baseURL = CustomEndpointDefaults.chatBaseURL
             apiKey = ""
-            modelName = "gpt-5.5"
+            modelName = CustomEndpointDefaults.chatModel
         }
 
         errorMessage = nil
@@ -539,6 +638,22 @@ struct CustomEnhancementModelEditorPanel: View {
         }
 
         errorMessage = nil
+
+        if let host = RemoteEndpointConfirmation.hostNeedingConfirmation(for: trimmedURL) {
+            pendingRemoteAction = .save
+            pendingRemoteHost = host
+            return
+        }
+        persistProvider()
+    }
+
+    /// Writes the provider. Runs directly from `saveProvider` for a loopback or accepted
+    /// host, or after the user confirms the remote-endpoint warning.
+    private func persistProvider() {
+        let trimmedName = displayName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedURL = baseURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedKey = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedModelName = modelName.trimmingCharacters(in: .whitespacesAndNewlines)
 
         let provider = CustomAIProviderConfig(
             id: editingProvider?.id ?? UUID(),

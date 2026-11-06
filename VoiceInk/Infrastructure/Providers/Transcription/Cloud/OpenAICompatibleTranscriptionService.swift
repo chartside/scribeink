@@ -22,7 +22,10 @@ class OpenAICompatibleTranscriptionService {
         // Ephemeral session per request: the shared session persists Alt-Svc and upgrades
         // new connections to HTTP/3, but QUIC bulk uploads blackhole behind VPNs that drop
         // full-size UDP datagrams (e.g. GlobalProtect), timing out large audio uploads.
-        let session = URLSession(configuration: .ephemeral)
+        // The redirect guard refuses redirects to hosts LocalEndpoint does not permit; a refused
+        // redirect returns the 3xx response, which the status check below reports as an error.
+        // The session holds its delegate strongly, so it must be invalidated (deferred below).
+        let session = URLSession(configuration: .ephemeral, delegate: PermittedRedirectGuard(), delegateQueue: nil)
         defer { session.finishTasksAndInvalidate() }
         let (data, response) = try await session.upload(for: request, from: body)
 

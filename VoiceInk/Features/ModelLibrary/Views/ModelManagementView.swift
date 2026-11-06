@@ -9,6 +9,11 @@ enum ModelFilter: String, CaseIterable, Identifiable {
 
     var id: String { self.rawValue }
 
+    /// The filters to present: the Cloud filter is hidden in on-device builds.
+    static var presentedCases: [ModelFilter] {
+        allCases.filter { $0 != .cloud || ProviderPolicy.allowsCloud }
+    }
+
     var title: LocalizedStringKey {
         switch self {
         case .local:
@@ -209,7 +214,7 @@ struct ModelManagementView: View {
 
     private var modelFilterPicker: some View {
         HStack(spacing: 12) {
-            ForEach(ModelFilter.allCases, id: \.self) { filter in
+            ForEach(ModelFilter.presentedCases, id: \.self) { filter in
                 Button(action: {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                         selectedFilter = filter
@@ -325,24 +330,26 @@ struct ModelManagementView: View {
 
             Spacer()
 
-            Button(action: {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                    selectedFilter = .cloud
+            if ProviderPolicy.allowsCloud {
+                Button(action: {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        selectedFilter = .cloud
+                    }
+                }) {
+                    HStack(spacing: 4) {
+                        Text("Use Cloud")
+                            .font(.system(size: 12, weight: .semibold))
+                        Image(systemName: "arrow.right")
+                            .font(.system(size: 10, weight: .bold))
+                    }
+                    .foregroundColor(AppTheme.Status.warningStrong)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(AppTheme.Status.warningStrong.opacity(0.12))
+                    .cornerRadius(6)
                 }
-            }) {
-                HStack(spacing: 4) {
-                    Text("Use Cloud")
-                        .font(.system(size: 12, weight: .semibold))
-                    Image(systemName: "arrow.right")
-                        .font(.system(size: 10, weight: .bold))
-                }
-                .foregroundColor(AppTheme.Status.warningStrong)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(AppTheme.Status.warningStrong.opacity(0.12))
-                .cornerRadius(6)
+                .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)

@@ -223,3 +223,20 @@ every PR and every push to `main`.
 - Updates, licensing, announcements and model download hosts: sub-project 5 for the first
   three.
 - `scribeink-ios`: separate repository, separate work.
+
+## Known limitations
+
+- Redirects on LLMkit paths (found in the final review, 2026-11-06). Custom chat
+  enhancement (`AIChatCompletionService`, through `OpenAILLMClient.chatCompletion`) and
+  Ollama enhancement (`OllamaService.enhance`, through `OllamaClient.generate`) go through
+  LLMkit (revision `a7541e0`). LLMkit builds its own `URLSession` per attempt
+  (`performRequest` in `HTTPClient.swift`, a private ephemeral session with no delegate)
+  and its public API takes no `URLSession`, configuration or delegate. So
+  `PermittedRedirectGuard` cannot be attached: a 307/308 from a loopback or confirmed
+  server is followed, and the POST (with the transcript) is re-sent to the `Location`
+  host. Ollama's connection check and model list (`OllamaClient.checkConnection`,
+  `fetchModels`, on `URLSession.shared`) follow redirects too, but send no transcript.
+  The pre-dispatch `LocalEndpoint` host check still applies. The package is not forked
+  or modified. Mitigation for now: point Ollama and custom chat endpoints only at servers
+  you control. A fix needs either an LLMkit change that accepts a session or delegate, or
+  an in-app request path for these two calls.

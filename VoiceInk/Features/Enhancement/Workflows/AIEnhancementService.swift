@@ -305,6 +305,10 @@ class AIEnhancementService: ObservableObject {
         contextSnapshot: RecordingContextSnapshot? = nil,
         vocabulary: RecordingVocabulary? = nil
     ) async throws -> AIEnhancementResult {
+        // Callers paste the raw transcript and show the error when enhancement throws.
+        if let provider = configuration.provider, OnDeviceReadiness.enhancementBlocked(provider) {
+            throw ProviderPolicyError.providerNotAllowed(provider.rawValue)
+        }
         let preparedVocabulary = vocabulary ?? CustomVocabularyService.shared.loadSavedVocabulary(from: modelContext)
         let startTime = Date()
         let promptName = configuration.prompt?.title

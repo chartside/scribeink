@@ -258,7 +258,7 @@ class AIService: ObservableObject {
     @Published private(set) var isOllamaRefreshing = false
 
     var connectedProviders: [AIProvider] {
-        AIProvider.allCases.filter { provider in
+        AIProvider.allCases.filter { ProviderPolicy.isAllowed($0) }.filter { provider in
             guard provider.supportsEnhancement else {
                 return false
             }
@@ -568,9 +568,23 @@ class AIService: ObservableObject {
         }
     }
 
+    /// The verification result for a provider the on-device policy refuses, or nil when the
+    /// provider is allowed. A refused provider is never contacted.
+    nonisolated static func verificationRefusal(
+        for provider: AIProvider,
+        allowsCloud: Bool = ProviderPolicy.allowsCloud
+    ) -> (isValid: Bool, errorMessage: String?)? {
+        guard !ProviderPolicy.isAllowed(provider, allowsCloud: allowsCloud) else { return nil }
+        return (false, ProviderPolicyError.providerNotAllowed(provider.rawValue).errorDescription)
+    }
+
     func verifyAPIKey(_ key: String, for provider: AIProvider, model: String? = nil) async -> (
         isValid: Bool, errorMessage: String?
     ) {
+        if let refusal = Self.verificationRefusal(for: provider) {
+            return refusal
+        }
+
         guard provider.requiresAPIKey else {
             return (true, nil)
         }
@@ -632,7 +646,23 @@ class AIService: ObservableObject {
         }
     }
 
+    /// Whether a background Ollama probe (launch, mode settings) may contact `baseURL`.
+    /// On-device builds skip an unconfirmed remote host; the user confirms it from settings.
+    nonisolated static func ollamaBackgroundProbePermitted(
+        baseURL: String,
+        allowsCloud: Bool = ProviderPolicy.allowsCloud,
+        defaults: UserDefaults = .standard
+    ) -> Bool {
+        if allowsCloud { return true }
+        guard let url = URL(string: baseURL) else { return false }
+        return LocalEndpoint.isPermitted(url, allowsCloud: allowsCloud, defaults: defaults)
+    }
+
     func refreshOllamaAvailabilityInBackground() {
+        guard Self.ollamaBackgroundProbePermitted(baseURL: ollamaService.baseURL) else {
+            ollamaService.isConnected = false
+            return
+        }
         Task { [weak self] in
             guard let self else { return }
             _ = await self.refreshOllamaAvailability()
@@ -678,6 +708,12 @@ class AIService: ObservableObject {
             return errorDescription
         }
 
+        if let policyError = error as? ProviderPolicyError,
+            let errorDescription = policyError.errorDescription
+        {
+            return errorDescription
+        }
+
         let nsError = error as NSError
         var details = [nsError.localizedDescription]
 
@@ -712,6 +748,21 @@ class AIService: ObservableObject {
         }
     }
 
+    /// The Ollama base URL to dispatch to, after the on-device host check.
+    /// Reads `ollamaBaseURL` (default `OllamaService.defaultBaseURL`) and throws
+    /// `ProviderPolicyError.remoteEndpointNotConfirmed` for an unconfirmed non-loopback host.
+    nonisolated static func ollamaDispatchURL(
+        allowsCloud: Bool = ProviderPolicy.allowsCloud,
+        defaults: UserDefaults = .standard
+    ) throws -> URL {
+        let stored = defaults.string(forKey: "ollamaBaseURL") ?? OllamaService.defaultBaseURL
+        guard let url = URL(string: stored) else {
+            throw LocalAIError.invalidURL
+        }
+        try LocalEndpoint.requirePermitted(url, allowsCloud: allowsCloud, defaults: defaults)
+        return url
+    }
+
     func enhanceWithOllama(
         text: String,
         systemPrompt: String,
@@ -719,7 +770,12 @@ class AIService: ObservableObject {
         timeout: TimeInterval = 30,
         retryOnTimeout: Bool = false
     ) async throws -> String {
-        try await ollamaService.enhance(
+        _ = try Self.ollamaDispatchURL()
+        // The service keeps its own copy of the base URL; check that one too in case it differs.
+        if let serviceURL = URL(string: ollamaService.baseURL) {
+            try LocalEndpoint.requirePermitted(serviceURL)
+        }
+        return try await ollamaService.enhance(
             text,
             withSystemPrompt: systemPrompt,
             model: model,
@@ -775,6 +831,7 @@ class AIService: ObservableObject {
 
     @MainActor
     func fetchOpenRouterModelsIfNeededForMigration() async {
+        guard ProviderPolicy.isAllowed(AIProvider.openRouter) else { return }
         guard openRouterModelCatalog.isEmpty,
             APIKeyManager.shared.hasAPIKey(forProvider: AIProvider.openRouter.rawValue)
         else {
@@ -786,6 +843,7 @@ class AIService: ObservableObject {
 
     @MainActor
     func fetchOpenRouterModels() async {
+        guard ProviderPolicy.isAllowed(AIProvider.openRouter) else { return }
         guard !isOpenRouterCatalogRefreshing else { return }
         isOpenRouterCatalogRefreshing = true
         defer { isOpenRouterCatalogRefreshing = false }
