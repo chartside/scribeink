@@ -1,0 +1,17 @@
+name: On-device check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  on-device-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check cloud code is gated and no new hosts appear
+        run: bash scripts/check-on-device.sh

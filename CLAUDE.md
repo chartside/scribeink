@@ -11,8 +11,13 @@ and nothing here should be copied from or synced with one.
 1. **Nothing leaves the device.** No audio, transcript, note or prompt goes to a network
    service. Transcription (whisper.cpp / Parakeet) and note generation run locally.
    VoiceInk's cloud providers (`Infrastructure/Providers/Transcription/Cloud/`, the cloud
-   chat/enhancement providers) are to be removed or hard-disabled, not just hidden. Treat
-   any new network call as a bug unless the operator approves it.
+   chat/enhancement providers) are compiled only under the `CLOUD_PROVIDERS` flag, which
+   the default build leaves off (`make local-cloud` turns it on for development). Every
+   dispatch goes through `ProviderPolicy`; custom and Ollama endpoints go through
+   `LocalEndpoint` (remote hosts need confirmation) and `PermittedRedirectGuard` (refuses
+   redirects off the permitted host). `scripts/check-on-device.sh` enforces the gating and
+   a host allowlist, and CI runs it on every PR. Treat any new network call as a bug unless
+   the operator approves it.
 2. **No PHI in the repo.** Tests, fixtures, screenshots and logs use synthetic data only.
 3. **Never invent clinical content.** A note holds only what was said. See the template
    rules in `clinical-templates/README.md`.
@@ -35,6 +40,8 @@ still to build.
 ## Roadmap (agreed 2026-11-06)
 
 - Remove or disable the cloud transcription and LLM paths so the app works fully offline.
+  Implemented (gated behind `CLOUD_PROVIDERS`); pending verification on a Mac
+  (`docs/qa/on-device-checklist.md`).
 - Medical vocabulary and a custom dictionary (drug names, anatomy, abbreviations).
 - Template-driven note generation from the transcript, using a local LLM.
 - Rename from VoiceInk to ScribeInk in the UI, bundle ID and app name (keep upstream attribution).
