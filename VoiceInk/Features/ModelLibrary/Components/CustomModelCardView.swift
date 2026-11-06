@@ -31,6 +31,8 @@ struct CustomModelCardView: View {
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundColor(Color(.labelColor))
 
+            RemoteEndpointBadge(urlString: model.apiEndpoint)
+
             Spacer()
         }
     }

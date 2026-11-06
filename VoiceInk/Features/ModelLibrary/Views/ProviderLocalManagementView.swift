@@ -7,6 +7,10 @@ struct LocalEnhancementServiceManagementView: View {
     @State private var isOllamaExpanded = false
     @State private var isLocalCLIExpanded = false
     @State private var ollamaBaseURL = UserDefaults.standard.string(forKey: "ollamaBaseURL") ?? "http://localhost:11434"
+    /// The value last written to settings: shown in the Remote badge and restored when the
+    /// user cancels the remote-endpoint warning.
+    @State private var savedOllamaBaseURL = UserDefaults.standard.string(forKey: "ollamaBaseURL") ?? "http://localhost:11434"
+    @State private var pendingRemoteOllamaHost: String?
     @State private var selectedOllamaModel = UserDefaults.standard.string(forKey: "ollamaSelectedModel") ?? "mistral"
     @State private var ollamaUserRefreshError: String?
     @State private var localCLICommandTemplate = ""
@@ -59,6 +63,12 @@ struct LocalEnhancementServiceManagementView: View {
             selectedOllamaModel = aiService.selectedModel(for: .ollama)
             syncLocalCLIStateFromService()
         }
+        .remoteEndpointConfirmation(
+            urlString: $ollamaBaseURL,
+            pendingHost: $pendingRemoteOllamaHost,
+            revertTo: savedOllamaBaseURL,
+            onConfirmed: { applyOllamaBaseURL() }
+        )
     }
 
     private var ollamaModelNames: [String] {
@@ -97,11 +107,13 @@ struct LocalEnhancementServiceManagementView: View {
                         .onChange(of: ollamaBaseURL) { _, _ in
                             ollamaUserRefreshError = nil
                         }
+                        .onSubmit {
+                            guard !aiService.isOllamaRefreshing else { return }
+                            submitOllamaBaseURL()
+                        }
 
                     Button {
-                        ollamaUserRefreshError = nil
-                        aiService.updateOllamaBaseURL(ollamaBaseURL)
-                        checkOllamaConnectionFromUserAction()
+                        submitOllamaBaseURL()
                     } label: {
                         if aiService.isOllamaRefreshing {
                             ProgressView()
@@ -114,6 +126,11 @@ struct LocalEnhancementServiceManagementView: View {
                     .controlSize(.small)
                     .disabled(aiService.isOllamaRefreshing)
                 }
+            }
+
+            if RemoteEndpointConfirmation.remoteHost(for: savedOllamaBaseURL) != nil {
+                RemoteEndpointBadge(urlString: savedOllamaBaseURL)
+                    .padding(.leading, LocalProviderMetrics.labelWidth + 12)
             }
 
             if let ollamaUserRefreshError {
@@ -217,6 +234,26 @@ struct LocalEnhancementServiceManagementView: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.top, 2)
         }
+    }
+
+    /// Saves the Ollama server URL, asking first when it points at a remote host the user
+    /// hasn't accepted. Runs from Connect/Refresh and from Return in the field, never on
+    /// each keystroke.
+    private func submitOllamaBaseURL() {
+        ollamaUserRefreshError = nil
+        if let host = RemoteEndpointConfirmation.hostNeedingConfirmation(for: ollamaBaseURL) {
+            pendingRemoteOllamaHost = host
+        } else {
+            applyOllamaBaseURL()
+        }
+    }
+
+    private func applyOllamaBaseURL() {
+        let newURL = ollamaBaseURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        ollamaBaseURL = newURL
+        savedOllamaBaseURL = newURL
+        aiService.updateOllamaBaseURL(newURL)
+        checkOllamaConnectionFromUserAction()
     }
 
     private func checkOllamaConnectionFromUserAction() {

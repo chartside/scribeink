@@ -150,6 +150,8 @@ private struct CustomEnhancementModelRow: View {
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
+
+                RemoteEndpointBadge(urlString: provider.baseURL)
             }
 
             Spacer()
@@ -185,6 +187,8 @@ struct CustomTranscriptionModelEditorPanel: View {
     @State private var isSaving = false
     @State private var connectionTest: ConnectionTestState = .idle
     @State private var connectionTestTask: Task<Void, Never>?
+    @State private var pendingRemoteHost: String?
+    @State private var pendingRemoteAction: RemoteEndpointAction = .save
 
     private var isEditing: Bool {
         editingModel != nil
@@ -202,7 +206,18 @@ struct CustomTranscriptionModelEditorPanel: View {
         connectionTest = .idle
     }
 
+    /// Asks before probing a remote host the user hasn't accepted: the probe sends the API
+    /// key and a dummy upload to it.
     private func runConnectionTest() {
+        if let host = RemoteEndpointConfirmation.hostNeedingConfirmation(for: apiEndpoint) {
+            pendingRemoteAction = .testConnection
+            pendingRemoteHost = host
+            return
+        }
+        startConnectionTest()
+    }
+
+    private func startConnectionTest() {
         connectionTestTask?.cancel()
         connectionTest = .testing
         let endpoint = apiEndpoint.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -274,6 +289,21 @@ struct CustomTranscriptionModelEditorPanel: View {
         .onChange(of: apiEndpoint) { _, _ in resetConnectionTest() }
         .onChange(of: apiKey) { _, _ in resetConnectionTest() }
         .onChange(of: modelName) { _, _ in resetConnectionTest() }
+        .remoteEndpointConfirmation(
+            urlString: $apiEndpoint,
+            pendingHost: $pendingRemoteHost,
+            // Cancelling a save restores the saved endpoint. A new model has none, so the
+            // typed value stays for the user to correct. Cancelling a test changes nothing.
+            revertTo: pendingRemoteAction == .save ? editingModel?.apiEndpoint : nil,
+            onConfirmed: {
+                switch pendingRemoteAction {
+                case .save:
+                    persistModel()
+                case .testConnection:
+                    startConnectionTest()
+                }
+            }
+        )
     }
 
     private var canSave: Bool {
@@ -323,6 +353,24 @@ struct CustomTranscriptionModelEditorPanel: View {
         }
 
         guard validationErrors.isEmpty else { return }
+
+        if let host = RemoteEndpointConfirmation.hostNeedingConfirmation(for: trimmedEndpoint) {
+            pendingRemoteAction = .save
+            pendingRemoteHost = host
+            return
+        }
+        persistModel()
+    }
+
+    /// Writes the model. Runs directly from `saveModel` for a loopback or accepted host, or
+    /// after the user confirms the remote-endpoint warning.
+    private func persistModel() {
+        let trimmedDisplayName = displayName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedEndpoint = apiEndpoint.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedKey = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedModelName = modelName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let generatedName = trimmedDisplayName.lowercased().replacingOccurrences(of: " ", with: "-")
+
         isSaving = true
 
         if let editingModel {
@@ -392,6 +440,8 @@ struct CustomEnhancementModelEditorPanel: View {
     @State private var isSaving = false
     @State private var connectionTest: ConnectionTestState = .idle
     @State private var connectionTestTask: Task<Void, Never>?
+    @State private var pendingRemoteHost: String?
+    @State private var pendingRemoteAction: RemoteEndpointAction = .save
 
     private var isEditing: Bool {
         editingProvider != nil
@@ -409,7 +459,18 @@ struct CustomEnhancementModelEditorPanel: View {
         connectionTest = .idle
     }
 
+    /// Asks before probing a remote host the user hasn't accepted: the probe sends the API
+    /// key and a chat request to it.
     private func runConnectionTest() {
+        if let host = RemoteEndpointConfirmation.hostNeedingConfirmation(for: baseURL) {
+            pendingRemoteAction = .testConnection
+            pendingRemoteHost = host
+            return
+        }
+        startConnectionTest()
+    }
+
+    private func startConnectionTest() {
         connectionTestTask?.cancel()
         connectionTest = .testing
         let url = baseURL.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -481,6 +542,21 @@ struct CustomEnhancementModelEditorPanel: View {
         .onChange(of: baseURL) { _, _ in resetConnectionTest() }
         .onChange(of: apiKey) { _, _ in resetConnectionTest() }
         .onChange(of: modelName) { _, _ in resetConnectionTest() }
+        .remoteEndpointConfirmation(
+            urlString: $baseURL,
+            pendingHost: $pendingRemoteHost,
+            // Cancelling a save restores the saved URL. A new provider has none, so the
+            // typed value stays for the user to correct. Cancelling a test changes nothing.
+            revertTo: pendingRemoteAction == .save ? editingProvider?.baseURL : nil,
+            onConfirmed: {
+                switch pendingRemoteAction {
+                case .save:
+                    persistProvider()
+                case .testConnection:
+                    startConnectionTest()
+                }
+            }
+        )
     }
 
     private var canSave: Bool {
@@ -539,6 +615,22 @@ struct CustomEnhancementModelEditorPanel: View {
         }
 
         errorMessage = nil
+
+        if let host = RemoteEndpointConfirmation.hostNeedingConfirmation(for: trimmedURL) {
+            pendingRemoteAction = .save
+            pendingRemoteHost = host
+            return
+        }
+        persistProvider()
+    }
+
+    /// Writes the provider. Runs directly from `saveProvider` for a loopback or accepted
+    /// host, or after the user confirms the remote-endpoint warning.
+    private func persistProvider() {
+        let trimmedName = displayName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedURL = baseURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedKey = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedModelName = modelName.trimmingCharacters(in: .whitespacesAndNewlines)
 
         let provider = CustomAIProviderConfig(
             id: editingProvider?.id ?? UUID(),

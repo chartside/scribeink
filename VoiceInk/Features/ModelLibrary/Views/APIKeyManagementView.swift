@@ -15,6 +15,9 @@ struct APIKeyManagementView: View {
         UserDefaults.standard.string(forKey: "ollamaSelectedModel") ?? "mistral"
     @State private var isCheckingOllama = false
     @State private var isEditingURL = false
+    @State private var savedOllamaBaseURL: String =
+        UserDefaults.standard.string(forKey: "ollamaBaseURL") ?? "http://localhost:11434"
+    @State private var pendingRemoteOllamaHost: String?
     @State private var localCLICommandTemplate: String = ""
     @State private var localCLITimeoutSeconds: Double = LocalCLIService.defaultTimeoutSeconds
     @State private var isSyncingLocalCLIState = false
@@ -146,32 +149,46 @@ struct APIKeyManagementView: View {
                 }
 
                 if aiService.selectedProvider == .ollama {
-                    if isEditingURL {
-                        HStack {
-                            TextField("Base URL", text: $ollamaBaseURL)
-                                .textFieldStyle(.roundedBorder)
+                    Group {
+                        if isEditingURL {
+                            HStack {
+                                TextField("Base URL", text: $ollamaBaseURL)
+                                    .textFieldStyle(.roundedBorder)
 
-                            Button("Save") {
-                                aiService.updateOllamaBaseURL(ollamaBaseURL)
-                                checkOllamaConnection()
-                                isEditingURL = false
+                                Button("Save") {
+                                    if let host = RemoteEndpointConfirmation.hostNeedingConfirmation(
+                                        for: ollamaBaseURL)
+                                    {
+                                        pendingRemoteOllamaHost = host
+                                    } else {
+                                        saveOllamaBaseURL()
+                                    }
+                                }
                             }
-                        }
-                    } else {
-                        HStack {
-                            Text(String(format: String(localized: "Server: %@"), ollamaBaseURL))
-                            Spacer()
-                            Button("Edit") { isEditingURL = true }
-                            Button(action: {
-                                ollamaBaseURL = "http://localhost:11434"
-                                aiService.updateOllamaBaseURL(ollamaBaseURL)
-                                checkOllamaConnection()
-                            }) {
-                                Image(systemName: "arrow.counterclockwise")
+                        } else {
+                            HStack {
+                                Text(String(format: String(localized: "Server: %@"), ollamaBaseURL))
+                                RemoteEndpointBadge(urlString: savedOllamaBaseURL)
+                                Spacer()
+                                Button("Edit") { isEditingURL = true }
+                                Button(action: {
+                                    ollamaBaseURL = "http://localhost:11434"
+                                    savedOllamaBaseURL = ollamaBaseURL
+                                    aiService.updateOllamaBaseURL(ollamaBaseURL)
+                                    checkOllamaConnection()
+                                }) {
+                                    Image(systemName: "arrow.counterclockwise")
+                                }
+                                .help("Reset to default")
                             }
-                            .help("Reset to default")
                         }
                     }
+                    .remoteEndpointConfirmation(
+                        urlString: $ollamaBaseURL,
+                        pendingHost: $pendingRemoteOllamaHost,
+                        revertTo: savedOllamaBaseURL,
+                        onConfirmed: { saveOllamaBaseURL() }
+                    )
 
                     if !ollamaModels.isEmpty {
                         Divider()
@@ -362,6 +379,14 @@ struct APIKeyManagementView: View {
         DispatchQueue.main.async {
             isSyncingLocalCLIState = false
         }
+    }
+
+    private func saveOllamaBaseURL() {
+        ollamaBaseURL = ollamaBaseURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        savedOllamaBaseURL = ollamaBaseURL
+        aiService.updateOllamaBaseURL(ollamaBaseURL)
+        checkOllamaConnection()
+        isEditingURL = false
     }
 
     private func checkOllamaConnection(showError: Bool = true) {

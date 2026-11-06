@@ -18,6 +18,11 @@ struct CustomModelConnectionTester {
             return .failure(
                 message: String(localized: "Endpoint must use HTTPS (plain HTTP is allowed only for localhost)"))
         }
+        // The editor asks the user before testing a remote host; this backs that up so an
+        // unconfirmed host never receives the key or the probe.
+        if let refusal = refusalIfNotPermitted(url) {
+            return refusal
+        }
 
         let boundary = "Boundary-\(UUID().uuidString)"
         var request = URLRequest(url: url)
@@ -35,7 +40,14 @@ struct CustomModelConnectionTester {
             "\r\n--\(boundary)\r\nContent-Disposition: form-data; name=\"model\"\r\n\r\n\(modelName)\r\n--\(boundary)--\r\n"
                 .data(using: .utf8)!)
 
-        let session = URLSession(configuration: .ephemeral)
+        // The redirect guard keeps a permitted endpoint from forwarding the probe to an
+        // unconfirmed host. The session holds its delegate strongly until it is invalidated,
+        // which the deferred finishTasksAndInvalidate() does.
+        let session = URLSession(
+            configuration: .ephemeral,
+            delegate: PermittedRedirectGuard(),
+            delegateQueue: nil
+        )
         defer { session.finishTasksAndInvalidate() }
 
         do {
@@ -74,6 +86,9 @@ struct CustomModelConnectionTester {
             return .failure(
                 message: String(localized: "Base URL must use HTTPS (plain HTTP is allowed only for localhost)"))
         }
+        if let refusal = refusalIfNotPermitted(url) {
+            return refusal
+        }
 
         let result = await OpenAILLMClient.verifyAPIKey(baseURL: url, apiKey: apiKey, model: modelName)
 
@@ -81,6 +96,17 @@ struct CustomModelConnectionTester {
             return .success
         }
         return .failure(message: result.errorMessage ?? String(localized: "Could not verify this API key"))
+    }
+
+    /// A failure when `url` is not a permitted endpoint (loopback, an accepted host, or any
+    /// host in cloud builds); nil when the probe may go ahead.
+    private static func refusalIfNotPermitted(_ url: URL) -> ConnectionTestResult? {
+        do {
+            try LocalEndpoint.requirePermitted(url)
+            return nil
+        } catch {
+            return .failure(message: error.localizedDescription)
+        }
     }
 
     /// HTTPS everywhere; plain HTTP only toward loopback, matching the app's
