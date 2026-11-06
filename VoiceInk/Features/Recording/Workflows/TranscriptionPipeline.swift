@@ -185,7 +185,24 @@ class TranscriptionPipeline {
                     !shouldRespondInRecorder && isSkipShortEnhancementEnabled
                     && WordCounter.count(in: text) <= shortEnhancementWordThreshold
 
-                if let enhancementService,
+                if let resolvedEnhancementConfiguration,
+                    resolvedEnhancementConfiguration.isEnabled,
+                    !shouldSkipEnhancement,
+                    let blockedProvider = OnDeviceReadiness.blockedEnhancementProvider(
+                        for: resolvedEnhancementConfiguration.mode
+                    )
+                {
+                    // The mode's saved provider is not allowed in this build, so resolution
+                    // dropped it. Skip enhancement, deliver the raw transcript, and say why.
+                    // enhancedText stays empty so "paste last enhancement" cannot paste this notice.
+                    let failureMessage = EnhancementFailureFormatter.message(
+                        for: ProviderPolicyError.providerNotAllowed(blockedProvider.rawValue)
+                    )
+                    NotificationManager.shared.showNotification(
+                        title: failureMessage,
+                        type: .warning
+                    )
+                } else if let enhancementService,
                     let resolvedEnhancementConfiguration,
                     resolvedEnhancementConfiguration.isEnabled,
                     enhancementService.isConfigured(for: resolvedEnhancementConfiguration),

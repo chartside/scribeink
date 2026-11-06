@@ -43,6 +43,7 @@ final class ModelPrewarmService: ObservableObject {
         logger.notice("App launched, scheduling prewarm")
         Task {
             try? await Task.sleep(for: .seconds(3))
+            OnDeviceReadiness.showLaunchNoticeIfBlocked(transcriptionModelManager: transcriptionModelManager)
             await performPrewarm()
         }
     }

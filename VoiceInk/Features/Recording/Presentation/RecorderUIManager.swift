@@ -248,6 +248,14 @@ class RecorderUIManager: ObservableObject, RecorderPanelPresenting {
                 await dismissRecorderPanel()
             }
         } else {
+            if OnDeviceReadiness.transcriptionBlocked(
+                mode: OnDeviceReadiness.modeForRecordingStart(modeId: modeId),
+                transcriptionModelManager: engine.transcriptionModelManager
+            ) {
+                ShortcutDiagnostics.notice("recorder-toggle result=blocked reason=provider-not-allowed")
+                OnDeviceReadiness.presentBlockedTranscription()
+                return
+            }
             SoundManager.shared.playStartSound()
             isRecorderPanelVisible = true
             await engine.toggleRecord(modeId: modeId)
