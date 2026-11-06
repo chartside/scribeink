@@ -161,17 +161,12 @@ enum OnDeviceReadiness {
     /// The mode a recording started now would most likely use: the explicit mode, then the
     /// frontmost app's rule, then the default mode. Website rules are applied later by
     /// `ActiveWindowService`, so the engine checks again once the mode is final.
-    static func modeForRecordingStart(modeId: UUID?) -> ModeConfig? {
-        let modeManager = ModeManager.shared
-        if let modeId, let config = modeManager.getConfiguration(with: modeId) {
-            return config
-        }
-        if let bundleIdentifier = NSWorkspace.shared.frontmostApplication?.bundleIdentifier,
-            let appConfig = modeManager.getConfigurationForApp(bundleIdentifier)
-        {
-            return appConfig
-        }
-        return modeManager.getDefaultConfiguration() ?? modeManager.currentEffectiveConfiguration
+    /// The mode a recording will use when the caller named one explicitly; `nil` otherwise.
+    /// App-rule and default modes are not final before recording starts, because a website
+    /// rule can still replace them, so they are checked by the engine after resolution.
+    static func explicitModeForRecordingStart(modeId: UUID?) -> ModeConfig? {
+        guard let modeId else { return nil }
+        return ModeManager.shared.getConfiguration(with: modeId)
     }
 
     static func showBlockedNotice(enhancementOnly: Bool = false) {

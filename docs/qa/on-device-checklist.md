@@ -19,6 +19,9 @@ build or run the app. These steps need macOS 15+ and Xcode.
   - Amended: setting only the global current-model key does not block if the active mode
     has its own model. Test with a mode whose own transcription model is a cloud model
     (for example a Groq model). In that case the notice opens the Modes settings page.
+- [ ] Added: when the default mode keeps a stale cloud model but a website rule for the
+  current page selects a mode with a local model, the shortcut records normally (the check
+  runs on the resolved mode, not the fallback).
 - [ ] A stale cloud enhancement selection pastes the raw transcript with the notice.
 - [ ] Added: in the default build, Local CLI is absent from the enhancement provider
   settings, and a stale Local CLI selection in a mode is not used (enhancement is skipped
