@@ -12,3 +12,8 @@ docs/*
 # Attribution sentence (About screen), and upstream links
 *	ScribeInk is based on VoiceInk by Prakash Joshi Pax, licensed under GPL v3
 *	github.com/Beingpax
+
+# The XPC service's display name is never shown to users; it keeps its VoiceInk
+# identifier. The literal includes "= " and ";" so it cannot mask the app's own
+# CFBundleDisplayName lines ("VoiceInk Dev", VoiceInk).
+VoiceInk.xcodeproj/project.pbxproj	= VoiceInkRefineXPC;

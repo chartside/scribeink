@@ -148,6 +148,16 @@ def snippet(s):
     s = " ".join(s.split())
     return s if len(s) <= 90 else s[:87] + "..."
 
+# pbxproj: build-setting Info.plist keys that become user-visible text
+PBX_KEY_RE = re.compile(r"INFOPLIST_KEY_(CFBundleDisplayName|CFBundleName|[A-Za-z]*UsageDescription)\s*=\s*(.+?);")
+if os.path.isfile(pbxproj):
+    with open(pbxproj, encoding="utf-8") as fh:
+        for n, line in enumerate(fh.read().split("\n"), 1):
+            m = PBX_KEY_RE.search(line)
+            if m and NEEDLE in m.group(2) and not allowed(pbxproj, line):
+                fail("string", "%s:%d" % (pbxproj, n),
+                     "INFOPLIST_KEY_%s contains VoiceInk: %s" % (m.group(1), snippet(m.group(2).strip('"'))))
+
 # xcstrings: every key (source text) and every stringUnit.value
 def find_line(text_lines, s):
     for needle in (json.dumps(s, ensure_ascii=False)[1:-1], json.dumps(s)[1:-1]):
@@ -210,7 +220,10 @@ for path in walk((".plist",)):
 LIT = r'"((?:[^"\\\n]|\\.)*)"'
 CALL_RE = re.compile(
     r'(?:String\(\s*localized:\s*|\bText\(\s*|\bButton\(\s*|\bLabel\(\s*|\.navigationTitle\(\s*|'
-    r'\.help\(\s*|\bToggle\(\s*|\bSection\(\s*|\b(?:messageText|informativeText)\s*=\s*)' + LIT)
+    r'\.help\(\s*|\bToggle\(\s*|\bSection\(\s*|\b(?:messageText|informativeText)\s*=\s*|'
+    r'\.alert\(\s*|\.confirmationDialog\(\s*|\.accessibilityLabel\(\s*|\.accessibilityHint\(\s*|'
+    r'\bTextField\(\s*|\bSecureField\(\s*|\bPicker\(\s*|\bMenu\(\s*|\bNSLocalizedString\(\s*|'
+    r'\bLocalizedStringKey\(\s*|\bText\(\s*verbatim:\s*)' + LIT)
 for path in walk((".swift",)):
     with open(path, encoding="utf-8", errors="replace") as fh:
         src = fh.read()
