@@ -336,11 +336,11 @@ class VoiceInkEngine: NSObject, ObservableObject {
                             else {
                                 // The panel checks before recording; this catches a mode picked
                                 // later (for example by a website rule).
-                                if OnDeviceReadiness.transcriptionBlocked(
+                                if let blockedRoute = OnDeviceReadiness.blockedTranscriptionRoute(
                                     modelResolution,
                                     knownModels: self.transcriptionModelManager.allAvailableModels
                                 ) {
-                                    OnDeviceReadiness.presentBlockedTranscription()
+                                    OnDeviceReadiness.presentBlockedTranscription(route: blockedRoute)
                                 } else {
                                     let failure = self.recordingModelFailure(for: modelResolution)
                                     NotificationManager.shared.showNotification(

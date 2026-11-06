@@ -5,6 +5,12 @@ import Foundation
 /// provider this build does not allow, so recording can be blocked and enhancement
 /// skipped with a notice. It only reads settings. It never changes a setting and never
 /// reads an API key.
+/// The settings page that can clear a blocked transcription selection.
+enum BlockedTranscriptionRoute: Equatable {
+    case modes
+    case models
+}
+
 @MainActor
 enum OnDeviceReadiness {
     /// The key `TranscriptionModelManager` stores the global model selection under.
@@ -32,7 +38,24 @@ enum OnDeviceReadiness {
         defaults: UserDefaults = .standard,
         allowsCloud: Bool = ProviderPolicy.allowsCloud
     ) -> Bool {
-        transcriptionBlocked(
+        blockedTranscriptionRoute(
+            mode: mode,
+            transcriptionModelManager: transcriptionModelManager,
+            defaults: defaults,
+            allowsCloud: allowsCloud
+        ) != nil
+    }
+
+    /// Where the user fixes a blocked mode, or nil when the mode is not blocked.
+    static func blockedTranscriptionRoute(
+        mode: ModeConfig? = nil,
+        transcriptionModelManager: TranscriptionModelManager,
+        defaults: UserDefaults = .standard,
+        allowsCloud: Bool = ProviderPolicy.allowsCloud
+    ) -> BlockedTranscriptionRoute? {
+        // Cloud builds block nothing; skip resolution, whose usable-model check looks up API keys.
+        guard !allowsCloud else { return nil }
+        return blockedTranscriptionRoute(
             ModeRuntimeResolver.transcriptionModelResolution(
                 mode: mode,
                 transcriptionModelManager: transcriptionModelManager
@@ -49,22 +72,39 @@ enum OnDeviceReadiness {
         defaults: UserDefaults = .standard,
         allowsCloud: Bool = ProviderPolicy.allowsCloud
     ) -> Bool {
+        blockedTranscriptionRoute(
+            resolution,
+            knownModels: knownModels,
+            defaults: defaults,
+            allowsCloud: allowsCloud
+        ) != nil
+    }
+
+    /// Pure: nil when the resolution is not blocked. A resolved model with a disallowed
+    /// provider is fixed in Models; a saved selection this build filtered out is fixed in
+    /// Modes, the only place that writes a mode's transcription model.
+    static func blockedTranscriptionRoute(
+        _ resolution: ModeTranscriptionModelResolution,
+        knownModels: [any TranscriptionModel],
+        defaults: UserDefaults = .standard,
+        allowsCloud: Bool = ProviderPolicy.allowsCloud
+    ) -> BlockedTranscriptionRoute? {
         switch resolution {
         case .available(_, let model), .unavailable(_, let model):
-            return !ProviderPolicy.isAllowed(model.provider, allowsCloud: allowsCloud)
+            return ProviderPolicy.isAllowed(model.provider, allowsCloud: allowsCloud) ? nil : .models
         case .modelNotFound(let mode):
             return isFilteredSelection(
                 mode.selectedTranscriptionModelName,
                 knownModels: knownModels,
                 allowsCloud: allowsCloud
-            )
+            ) ? .modes : nil
         case .noSelection, .noMode:
             // Modes without a selection inherit the global key on migration.
             return isFilteredSelection(
                 defaults.string(forKey: globalTranscriptionSelectionKey),
                 knownModels: knownModels,
                 allowsCloud: allowsCloud
-            )
+            ) ? .modes : nil
         }
     }
 
@@ -141,10 +181,15 @@ enum OnDeviceReadiness {
         )
     }
 
-    /// Recording is blocked: tell the user and open the model settings.
-    static func presentBlockedTranscription() {
+    /// Recording is blocked: tell the user and open the settings page that can clear the block.
+    static func presentBlockedTranscription(route: BlockedTranscriptionRoute) {
         showBlockedNotice()
-        ModeSetupNavigator.openModelsSettings()
+        switch route {
+        case .modes:
+            ModeSetupNavigator.openModesSettings()
+        case .models:
+            ModeSetupNavigator.openModelsSettings()
+        }
     }
 
     /// Shows the notice once per launch when the default mode is blocked.

@@ -248,12 +248,12 @@ class RecorderUIManager: ObservableObject, RecorderPanelPresenting {
                 await dismissRecorderPanel()
             }
         } else {
-            if OnDeviceReadiness.transcriptionBlocked(
+            if let blockedRoute = OnDeviceReadiness.blockedTranscriptionRoute(
                 mode: OnDeviceReadiness.modeForRecordingStart(modeId: modeId),
                 transcriptionModelManager: engine.transcriptionModelManager
             ) {
                 ShortcutDiagnostics.notice("recorder-toggle result=blocked reason=provider-not-allowed")
-                OnDeviceReadiness.presentBlockedTranscription()
+                OnDeviceReadiness.presentBlockedTranscription(route: blockedRoute)
                 return
             }
             SoundManager.shared.playStartSound()
