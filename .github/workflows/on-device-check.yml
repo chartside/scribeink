@@ -15,6 +15,5 @@ jobs:
       - uses: actions/checkout@v4
       - name: Check cloud code is gated and no new hosts appear
         run: bash scripts/check-on-device.sh
-      - name: Check ScribeInk identity (advisory until the rename lands)
+      - name: Check ScribeInk identity
         run: bash scripts/check-scribeink-identity.sh
-        continue-on-error: true

@@ -69,6 +69,22 @@ component shapes and voice shared with WhiteCoat Prep. Don't introduce colours o
 outside it without the operator's approval. Until sub-project 2, existing `AppTheme` tokens
 are fine.
 
+## Identity
+
+- Bundle IDs: `com.chartside.ScribeInk` (Release), `com.chartside.ScribeInk.dev` (Dev),
+  `com.chartside.ScribeInk.RefineXPC`, `com.chartside.ScribeInkTests`,
+  `com.chartside.ScribeInkUITests`. Product names: `ScribeInk` and `ScribeInk Dev`.
+- `AppIdentity` (`VoiceInk/App/Configuration/AppIdentity.swift`) is the only source of IDs,
+  folder names, logger subsystems and queue labels. Don't hard-code them elsewhere.
+- `UpstreamServices` (`VoiceInk/Infrastructure/Privacy/UpstreamServices.swift`) switches the
+  upstream updates, licensing, announcements and star prompt. All are off until roadmap item 4.
+- Internal target, file and Swift type names stay `VoiceInk*` to keep upstream merges workable;
+  only user-visible names change.
+- `scripts/check-scribeink-identity.sh` runs in CI (blocking) next to `check-on-device.sh`.
+- About shows the GPL attribution (`VoiceInk/App/About/AboutPanel.swift`); keep it.
+- Placeholder icons come from `scripts/generate-placeholder-icons.py`. QA:
+  `docs/qa/scribeink-identity-checklist.md`.
+
 ## Build
 
 See `BUILDING.md` (`make local`). It needs macOS 15+ and Xcode, so it can't be built in a

@@ -1,10 +1,7 @@
 # Hosts present at upstream 5c95ff9. Add a line only with operator approval.
 # Format: <path relative to repo root> <host>
-VoiceInk/Features/Dashboard/Components/ModelInsightComponents.swift tryvoiceink.com
+VoiceInk/App/About/AboutPanel.swift github.com
 VoiceInk/Features/Dashboard/State/GitHubStarPromptCoordinator.swift github.com
-VoiceInk/Features/Dictionary/Views/DictionarySettingsPanel.swift tryvoiceink.com
-VoiceInk/Features/Dictionary/Views/DictionarySettingsView.swift tryvoiceink.com
-VoiceInk/Features/Dictionary/Views/WordReplacementView.swift tryvoiceink.com
 VoiceInk/Features/Enhancement/State/AIService.swift api.anthropic.com
 VoiceInk/Features/Enhancement/State/AIService.swift api.assemblyai.com
 VoiceInk/Features/Enhancement/State/AIService.swift api.cerebras.ai
@@ -40,7 +37,6 @@ VoiceInk/Features/ModelLibrary/Views/APIKeyManagementView.swift portal.speechmat
 VoiceInk/Features/ModelLibrary/Views/APIKeyManagementView.swift www.assemblyai.com
 VoiceInk/Features/ModelLibrary/Views/CustomProviderManagementView.swift api.example.com
 VoiceInk/Features/ModelLibrary/Views/CustomProviderManagementView.swift api.openai.com
-VoiceInk/Features/ModelLibrary/Views/ModelManagementView.swift tryvoiceink.com
 VoiceInk/Features/ModelLibrary/Views/ModelSettingsPanel.swift cookbook.openai.com
 VoiceInk/Features/ModelLibrary/Views/ProviderCloudManagementView.swift aistudio.google.com
 VoiceInk/Features/ModelLibrary/Views/ProviderCloudManagementView.swift cloud.cerebras.ai
@@ -55,10 +51,8 @@ VoiceInk/Features/ModelLibrary/Views/ProviderCloudManagementView.swift elevenlab
 VoiceInk/Features/ModelLibrary/Views/ProviderCloudManagementView.swift openrouter.ai
 VoiceInk/Features/ModelLibrary/Views/ProviderCloudManagementView.swift platform.openai.com
 VoiceInk/Features/ModelLibrary/Views/ProviderCloudManagementView.swift play.cartesia.ai
-VoiceInk/Features/ModelLibrary/Views/ProviderCloudManagementView.swift tryvoiceink.com
 VoiceInk/Features/ModelLibrary/Views/ProviderCloudManagementView.swift www.assemblyai.com
 VoiceInk/Features/Modes/Models/CustomCommandTemplate.swift www.google.com
-VoiceInk/Features/Modes/Views/ModeView.swift tryvoiceink.com
 VoiceInk/Features/Onboarding/Components/AIProviderVerificationCard.swift aistudio.google.com
 VoiceInk/Features/Onboarding/Components/AIProviderVerificationCard.swift cloud.cerebras.ai
 VoiceInk/Features/Onboarding/Components/AIProviderVerificationCard.swift console.anthropic.com
@@ -66,7 +60,6 @@ VoiceInk/Features/Onboarding/Components/AIProviderVerificationCard.swift console
 VoiceInk/Features/Onboarding/Components/AIProviderVerificationCard.swift console.mistral.ai
 VoiceInk/Features/Onboarding/Components/AIProviderVerificationCard.swift openrouter.ai
 VoiceInk/Features/Onboarding/Components/AIProviderVerificationCard.swift platform.openai.com
-VoiceInk/Features/Settings/Support/EmailSupport.swift tryvoiceink.com
 VoiceInk/Infrastructure/Licensing/PolarService.swift api.polar.sh
 VoiceInk/Infrastructure/Privacy/UpstreamServices.swift github.com
 VoiceInk/Infrastructure/Providers/Enhancement/Chat/AIChatCompletionService.swift tryvoiceink.com
